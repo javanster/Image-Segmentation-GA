@@ -6,6 +6,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The ImageReader class provides utility methods for reading and writing images.
+ */
 public class ImageReader {
 
     // Private constructor to prevent instantiation
@@ -13,6 +16,13 @@ public class ImageReader {
         throw new UnsupportedOperationException("ImageReader is a utility class and should not be instantiated.");
     }
 
+    /**
+     * Reads the pixels of an image from the specified file path.
+     * Each pixel is represented as a list of three integers (RGB values).
+     *
+     * @param imagePath the path to the image file
+     * @return a list of lists representing the RGB values of each pixel in the image
+     */
     public static List<List<Integer>> getImagePixels(String imagePath) {
         List<List<Integer>> pixels = new ArrayList<>();
 
@@ -43,6 +53,12 @@ public class ImageReader {
         return pixels;
     }
 
+    /**
+     * Retrieves the dimensions (width and height) of an image from the specified file path.
+     *
+     * @param imagePath the path to the image file
+     * @return an array containing the width and height of the image
+     */
     public static int[] getImageDimensions(String imagePath) {
         try {
             BufferedImage image = ImageIO.read(new File(imagePath));
@@ -53,6 +69,14 @@ public class ImageReader {
         return new int[]{};
     }
 
+    /**
+     * Writes an image using the specified pixel values, width, height, and output path.
+     *
+     * @param pixels     a list of lists representing the RGB values of each pixel in the image
+     * @param width      the width of the image
+     * @param height     the height of the image
+     * @param outputPath the path to write the output image file
+     */
     public static void writeImage(List<List<Integer>> pixels, int width, int height, String outputPath) {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 
@@ -91,3 +115,4 @@ public class ImageReader {
         writeImage(pixels, width, height, outputPath);
     }
 }
+
