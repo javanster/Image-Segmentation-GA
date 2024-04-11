@@ -29,8 +29,8 @@ public class Individual {
     
     private List<Integer> chromosome;
     private List<List<Integer>> pixels;
-    int imageHeight;
-    int imageLength;
+    private int imageHeight;
+    private int imageLength;
 
 
     public Individual(List<List<Integer>> pixels, int imageHeight, int imageLength) {
