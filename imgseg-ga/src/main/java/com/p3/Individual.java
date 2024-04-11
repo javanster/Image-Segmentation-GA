@@ -154,7 +154,7 @@ public class Individual {
      * @param imageLength The length of the image in pixels.
      * @return The direction of the edge from the origin pixel to the target pixel.
      */
-    private int getGraphDirection(int originPixelIndex, int targetPixel, int imageHeight, int imageLength) {
+    public int getGraphDirection(int originPixelIndex, int targetPixel, int imageHeight, int imageLength) {
         int originRow = originPixelIndex / imageLength;
         int originCol = originPixelIndex % imageLength;
         
