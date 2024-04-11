@@ -1,12 +1,12 @@
 package com.p3;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * The ObjectiveFunctions class provides static methods for calculating objective function values
+ * used in image segmentation genetic algorithms.
+ */
 public class ObjectiveFunctions {
 
     // Private constructor to prevent instantiation
@@ -14,6 +14,16 @@ public class ObjectiveFunctions {
         throw new UnsupportedOperationException("ObjectiveFunctions is a utility class and should not be instantiated.");
     }
 
+    /**
+     * Calculates the edge value of an individual based on the given segments.
+     * The edge value is the sum of the Euclidean distances between neighboring pixels
+     * that belong to different segments.
+     * Subject to MAXIMIZATION.
+     *
+     * @param individual The individual representing the image.
+     * @param segments   The segments of the image.
+     * @return The edge value of the individual.
+     */
     public static double edgeValue(Individual individual, List<Set<Integer>> segments) {
         double edgeValue = 0.0;
         List<List<Integer>> pixels = individual.getPixels();
@@ -32,6 +42,16 @@ public class ObjectiveFunctions {
         return edgeValue;
     }
 
+    /**
+     * Calculates the connectivity measure of an individual based on the given segments.
+     * The connectivity measure is the sum of the inverse of the number of neighboring pixels
+     * that belong to different segments.
+     * Subject to MINIMIZATION.
+     *
+     * @param individual The individual representing the image.
+     * @param segments   The segments of the image.
+     * @return The connectivity measure of the individual.
+     */
     public static double connectivityMeasure(Individual individual, List<Set<Integer>> segments) {
         double connectivityMeasure = 0.0;
         List<List<Integer>> pixels = individual.getPixels();
@@ -49,6 +69,16 @@ public class ObjectiveFunctions {
         return connectivityMeasure;
     }
 
+    /**
+     * Calculates the overall deviation of an individual based on the given segments.
+     * The overall deviation is the sum of the Euclidean distances between each pixel in a segment
+     * and the centroid of that segment.
+     * Subject to MINIMIZATION.
+     *
+     * @param individual The individual representing the image.
+     * @param segments   The segments of the image.
+     * @return The overall deviation of the individual.
+     */
     public static double overallDeviation(Individual individual, List<Set<Integer>> segments) {
         double segmentDeviation = 0.0;
         List<List<Integer>> pixels = individual.getPixels();
@@ -61,6 +91,15 @@ public class ObjectiveFunctions {
         return segmentDeviation;
     }
 
+    /**
+     * Returns true if the pixels at indexes i and j belong to the same segment.
+     * Helper method for edgeValue and connectivityMeasure.
+     * 
+     * @param i The index of the first pixel.
+     * @param j The index of the second pixel.
+     * @param segments The segments of the image.
+     * @return True if the pixels belong to the same segment, false otherwise.
+     */
     private static boolean inSameSegment(int i, int j, List<Set<Integer>> segments) {
         for (Set<Integer> segment : segments) {
             if (segment.contains(i) && segment.contains(j)) {
@@ -70,6 +109,15 @@ public class ObjectiveFunctions {
         return false;
     }
 
+    /**
+     * Returns the centroid of a segment of the image.
+     * The centroid is the average RGB values of the pixels in the segment.
+     * Helper method for overallDeviation.
+     * 
+     * @param individual The individual representing the image.
+     * @param segment The segment of the image.
+     * @return The centroid of the segment.
+     */
     private static List<Integer> getCentroid(Individual individual, Set<Integer> segment) {        
         int redSum = 0;
         int greenSum = 0;
@@ -106,14 +154,12 @@ public class ObjectiveFunctions {
 
     // main
     public static void main(String[] args) {
-        List<List<Integer>> pixels = new ArrayList<List<Integer>>() {
-            {
-                add(List.of(1, 2, 3));
-                add(List.of(4, 5, 6));
-                add(List.of(7, 8, 9));
-                add(List.of(10, 11, 12));
-            }
-        };
+        List<List<Integer>> pixels = List.of(
+            List.of(1, 2, 3),
+            List.of(4, 5, 6),
+            List.of(7, 8, 9),
+            List.of(10, 11, 12)
+        );
         int imageHeight = 2;
         int imageLength = 2;
         Individual individual = new Individual(pixels, imageHeight, imageLength);
