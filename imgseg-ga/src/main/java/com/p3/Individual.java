@@ -28,10 +28,16 @@ import java.util.Set;
 public class Individual {
     
     private List<Integer> chromosome;
+    private List<List<Integer>> pixels;
+    int imageHeight;
+    int imageLength;
 
 
     public Individual(List<List<Integer>> pixels, int imageHeight, int imageLength) {
 
+        this.pixels = pixels;
+        this.imageHeight = imageHeight;
+        this.imageLength = imageLength;
         Map<Set<Integer>, Double> edgeWeights = new HashMap<>();
 
         for (int i = 0; i < pixels.size(); i++) {
@@ -57,6 +63,33 @@ public class Individual {
      */
     public List<Integer> getChromosome() {
         return this.chromosome;
+    }
+
+    /**
+     * Returns the pixels of the image.
+     * 
+     * @return The pixels of the image.
+     */
+    public List<List<Integer>> getPixels() {
+        return this.pixels;
+    }
+
+    /**
+     * Returns the height of the image in pixels.
+     * 
+     * @return The height of the image in pixels.
+     */
+    public int getImageHeight() {
+        return this.imageHeight;
+    }
+
+    /**
+     * Returns the length of the image in pixels.
+     * 
+     * @return The length of the image in pixels.
+     */
+    public int getImageLength() {
+        return this.imageLength;
     }
 
     /**
@@ -164,7 +197,7 @@ public class Individual {
      * @param imageLength The length of the image in pixels.
      * @return A list of the indexes of the neighboring pixels of the pixel at index pixelIndex.
      */
-    private List<Integer> getNeighboringPixelIndexes(int pixelIndex, int imageHeight, int imageLength) {
+    public List<Integer> getNeighboringPixelIndexes(int pixelIndex, int imageHeight, int imageLength) {
         if (pixelIndex < 0 || pixelIndex >= imageHeight * imageLength) {
             throw new IllegalArgumentException("Invalid pixel index");
         }

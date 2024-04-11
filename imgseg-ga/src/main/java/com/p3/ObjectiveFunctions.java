@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class ObjectiveFunctions {
 
@@ -13,8 +14,31 @@ public class ObjectiveFunctions {
         throw new UnsupportedOperationException("ObjectiveFunctions is a utility class and should not be instantiated.");
     }
 
-    public static double edgeValue(List<Integer> solution) {
-        return 0.0;
+    public static double edgeValue(Individual individual, List<Set<Integer>> segments) {
+        double edgeValue = 0.0;
+        List<List<Integer>> pixels = individual.getPixels();
+        int imageHeight = individual.getImageHeight();
+        int imageLength = individual.getImageLength();
+
+        for (int i = 0; i < pixels.size(); i++) {
+            // j should iterate through the neigbours of i
+            for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
+                if (!inSameSegment(i, j, segments)) {
+                    edgeValue += euclideanDistance(pixels.get(i), pixels.get(j));
+                }
+            }
+        }
+
+        return edgeValue;
+    }
+
+    private static boolean inSameSegment(int i, int j, List<Set<Integer>> segments) {
+        for (Set<Integer> segment : segments) {
+            if (segment.contains(i) && segment.contains(j)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
