@@ -32,15 +32,6 @@ public class ObjectiveFunctions {
         return edgeValue;
     }
 
-    private static boolean inSameSegment(int i, int j, List<Set<Integer>> segments) {
-        for (Set<Integer> segment : segments) {
-            if (segment.contains(i) && segment.contains(j)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static double connectivityMeasure(Individual individual, List<Set<Integer>> segments) {
         double connectivityMeasure = 0.0;
         List<List<Integer>> pixels = individual.getPixels();
@@ -56,6 +47,47 @@ public class ObjectiveFunctions {
         }
 
         return connectivityMeasure;
+    }
+
+    public static double overallDeviation(Individual individual, List<Set<Integer>> segments) {
+        double segmentDeviation = 0.0;
+        List<List<Integer>> pixels = individual.getPixels();
+
+        for (Set<Integer> segment : segments) {
+            for (Integer i : segment) {
+                segmentDeviation += euclideanDistance(pixels.get(i), getCentroid(individual, segment));
+            }
+        }
+        return segmentDeviation;
+    }
+
+    private static boolean inSameSegment(int i, int j, List<Set<Integer>> segments) {
+        for (Set<Integer> segment : segments) {
+            if (segment.contains(i) && segment.contains(j)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static List<Integer> getCentroid(Individual individual, Set<Integer> segment) {        
+        int redSum = 0;
+        int greenSum = 0;
+        int blueSum = 0;
+        List<List<Integer>> pixels = individual.getPixels();
+
+        for (Integer i : segment) {
+            List<Integer> pixel = pixels.get(i);
+            redSum += pixel.get(0);
+            greenSum += pixel.get(1);
+            blueSum += pixel.get(2);
+        }
+
+        int redCentroid = redSum / segment.size();
+        int greenCentroid = greenSum / segment.size();
+        int blueCentroid = blueSum / segment.size();
+
+        return List.of(redCentroid, greenCentroid, blueCentroid);
     }
 
     /**
@@ -92,6 +124,7 @@ public class ObjectiveFunctions {
         segments.add(segment2);
         System.out.println(edgeValue(individual, segments));
         System.out.println(connectivityMeasure(individual, segments));
+        System.out.println(overallDeviation(individual, segments));
     }
 }
 
