@@ -42,7 +42,7 @@ public class Individual {
                 List<Integer> neighbor = pixels.get(neighborIndex);
                 Set<Integer> edge = Set.of(i, neighborIndex);
                 if (!edgeWeights.containsKey(edge)) {
-                    edgeWeights.put(edge, this.euclideanDistance(pixel, neighbor));
+                    edgeWeights.put(edge, ObjectiveFunctions.euclideanDistance(pixel, neighbor));
                 }
             }
         }
@@ -191,20 +191,4 @@ public class Individual {
 
         return neighbors;
     }
-    
-
-    /**
-     * Returns the Euclidean distance between two pixels in the image. The Euclidean distance is calculated
-     * as the square root of the sum of the squared differences of the RGB values of the pixels.
-     * 
-     * @param pixel1 The RGB values of the first pixel.
-     * @param pixel2 The RGB values of the second pixel.
-     * @return The Euclidean distance between the two pixels.
-     */
-    private double euclideanDistance(List<Integer> pixel1, List<Integer> pixel2) {
-        return Math.sqrt(Math.pow(pixel1.get(0) - pixel2.get(0), 2) + 
-            Math.pow(pixel1.get(1) - pixel2.get(1), 2) + 
-            Math.pow(pixel1.get(2) - pixel2.get(2), 2));
-    }
-
 }
