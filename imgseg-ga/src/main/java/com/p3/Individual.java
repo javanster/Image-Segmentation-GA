@@ -23,14 +23,13 @@ import java.util.HashSet;
  * Ripon, Kazi Shah Nawaz & Ali, Lasker & Newaz, Sarfaraz & Ma, Jinwen. (2017). A Multi-Objective
  * Evolutionary Algorithm for Color Image Segmentation. 10.1007/978-3-319-71928-3_17
  * 
- * @param pixels A list of pixels in the image. Each pixel is represented as a list of three integers (RGB values).
- * @param imageHeight The height of the image in pixels.
- * @param imageLength The length of the image in pixels.
+ * @param image The image the individual is based on.
  */
 public class Individual {
     
     private List<Integer> chromosome;
     private List<Set<Integer>> segments;
+    private Map<Integer, Integer> segmentMap;
     private Image image;
 
 
@@ -40,8 +39,18 @@ public class Individual {
         int imageLength = image.getImageLength();
 
         Map<Set<Integer>, Double> edgeWeights = this.getEdgeWeights(image);
-        this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength);
+       
+        //this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength);
+
+        List<Integer> chromosome = new ArrayList<>();
+        Random random = new Random();
+        for (int i = 0; i < imageHeight * imageLength; i++) {
+            chromosome.add(random.nextInt(9));
+        }
+        this.chromosome = chromosome;
+
         this.setSegments();
+        this.setSegmentMap();
     }
 
     /**
@@ -63,6 +72,15 @@ public class Individual {
     }
 
     /**
+     * Returns the segment map of the individual.
+     * 
+     * @return The segment map of the individual.
+     */
+    public Map<Integer, Integer> getSegmentMap() {
+        return this.segmentMap;
+    }
+
+    /**
      * Returns the image of the individual.
      * 
      * @return The image of the individual.
@@ -71,6 +89,13 @@ public class Individual {
         return this.image;
     }
 
+    /**
+     * Returns a map of the edges between the pixels in the image and their weights.
+     * The weight of the edge between two pixels is the Euclidean distance between the RGB values of the pixels.
+     * 
+     * @param image The image the individual is based on.
+     * @return A map of the edges between the pixels in the image and their weights.
+     */
     private Map<Set<Integer>, Double> getEdgeWeights(Image image) {
         List<List<Integer>> pixels = image.getPixels();
         int imageHeight = image.getImageHeight();
@@ -226,7 +251,11 @@ public class Individual {
         return neighbors;
     }
 
-    public void setSegments() {
+    /**
+     * Sets the segments of the individual based on the chromosome. The segments are created by traversing
+     * the graphs of the individual. One graph corresponds to one segment.
+     */
+    private void setSegments() {
         Map<Integer, Set<Integer>> pixelToSegment = new HashMap<>();
         for (int i = 0; i < chromosome.size(); i++) {
             if (!pixelToSegment.containsKey(i)) {
@@ -264,6 +293,32 @@ public class Individual {
         this.segments = segments;
     }
 
+    /**
+     * Sets the segment map of the individual. The segment map is a map where the keys are the indexes of the pixels
+     * in the image and the values are the indexes of the segments the pixels belong to.
+     */
+    private void setSegmentMap() {
+        Map<Integer, Integer> segmentMap = new HashMap<>();
+        for (int i = 0; i < this.segments.size(); i++) {
+            Set<Integer> segment = this.segments.get(i);
+            for (int pixel : segment) {
+                segmentMap.put(pixel, i);
+            }
+        }
+        this.segmentMap = segmentMap;
+    }
+
+    /**
+     * Returns the index of the neighboring pixel of the pixel at index pixelIndex in the image based on the direction.
+     * The direction is represented as an integer from 1 to 8, where 1 is right, 2 is left, 3 is up, 4 is down,
+     * 5 is top right, 6 is bottom right, 7 is top left, and 8 is bottom left.
+     * 
+     * @param pixelIndex The index of the pixel in the image.
+     * @param imageHeight The height of the image in pixels.
+     * @param imageLength The length of the image in pixels.
+     * @param direction The direction of the neighboring pixel.
+     * @return The index of the neighboring pixel of the pixel at index pixelIndex based on the direction.
+     */
     private int getNeighborFromGraph(int pixelIndex, int imageHeight, int imageLength, int direction) {
         int row = pixelIndex / imageLength;
         int col = pixelIndex % imageLength;
@@ -320,9 +375,6 @@ public class Individual {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
         Individual individual = new Individual(image);
-        // List<Integer> chromosome = individual.getChromosome();
-        // System.out.println(chromosome);
-        List<Set<Integer>> segments = individual.getSegments();
-        System.out.println(segments);
+        System.out.println(individual.getSegmentMap());
     }
 }
