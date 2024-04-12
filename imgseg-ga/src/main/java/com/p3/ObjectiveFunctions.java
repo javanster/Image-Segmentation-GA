@@ -1,5 +1,6 @@
 package com.p3;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -27,11 +28,13 @@ public class ObjectiveFunctions {
         List<List<Integer>> pixels = individual.getImage().getPixels();
         int imageHeight = individual.getImage().getImageHeight();
         int imageLength = individual.getImage().getImageLength();
+        Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
-            // j should iterate through the neigbours of i
-            for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
-                if (!inSameSegment(i, j, individual.getSegments())) {
+            int segmentIndex = segmentMap.get(i);
+            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageLength);
+            for (int j : neighboringPixelIndexes) {
+                if (segmentIndex != segmentMap.get(j)) {
                     edgeValue += euclideanDistance(pixels.get(i), pixels.get(j));
                 }
             }
@@ -39,6 +42,7 @@ public class ObjectiveFunctions {
 
         return edgeValue;
     }
+
 
     /**
      * Calculates the connectivity measure of an individual based on its current segments.
@@ -54,10 +58,11 @@ public class ObjectiveFunctions {
         List<List<Integer>> pixels = individual.getImage().getPixels();
         int imageHeight = individual.getImage().getImageHeight();
         int imageLength = individual.getImage().getImageLength();
+        Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
             for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
-                if (!inSameSegment(i, j, individual.getSegments())) {
+                if (!segmentMap.get(i).equals(segmentMap.get(j))) {
                     connectivityMeasure += 1.0 / 8; // alernatively: (double) 1 / individual.getGraphDirection(i, j, imageHeight, imageLength);
                 }
             }
@@ -73,7 +78,6 @@ public class ObjectiveFunctions {
      * Subject to MINIMIZATION.
      *
      * @param individual The individual representing the image.
-     * @param segments   The segments of the image.
      * @return The overall deviation of the individual.
      */
     public static double overallDeviation(Individual individual) {
@@ -86,24 +90,6 @@ public class ObjectiveFunctions {
             }
         }
         return segmentDeviation;
-    }
-
-    /**
-     * Returns true if the pixels at indexes i and j belong to the same segment.
-     * Helper method for edgeValue and connectivityMeasure.
-     * 
-     * @param i The index of the first pixel.
-     * @param j The index of the second pixel.
-     * @param segments The segments of the image.
-     * @return True if the pixels belong to the same segment, false otherwise.
-     */
-    private static boolean inSameSegment(int i, int j, List<Set<Integer>> segments) {
-        for (Set<Integer> segment : segments) {
-            if (segment.contains(i) && segment.contains(j)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**
@@ -149,7 +135,6 @@ public class ObjectiveFunctions {
             Math.pow(pixel1.get(2) - pixel2.get(2), 2));
     }
 
-    // main
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
