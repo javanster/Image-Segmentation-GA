@@ -1,5 +1,4 @@
 package com.p3;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -15,25 +14,24 @@ public class ObjectiveFunctions {
     }
 
     /**
-     * Calculates the edge value of an individual based on the given segments.
+     * Calculates the edge value of an individual based its current segments.
      * The edge value is the sum of the Euclidean distances between neighboring pixels
      * that belong to different segments.
      * Subject to MAXIMIZATION.
      *
      * @param individual The individual representing the image.
-     * @param segments   The segments of the image.
      * @return The edge value of the individual.
      */
-    public static double edgeValue(Individual individual, List<Set<Integer>> segments) {
+    public static double edgeValue(Individual individual) {
         double edgeValue = 0.0;
-        List<List<Integer>> pixels = individual.getPixels();
-        int imageHeight = individual.getImageHeight();
-        int imageLength = individual.getImageLength();
+        List<List<Integer>> pixels = individual.getImage().getPixels();
+        int imageHeight = individual.getImage().getImageHeight();
+        int imageLength = individual.getImage().getImageLength();
 
         for (int i = 0; i < pixels.size(); i++) {
             // j should iterate through the neigbours of i
             for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
-                if (!inSameSegment(i, j, segments)) {
+                if (!inSameSegment(i, j, individual.getSegments())) {
                     edgeValue += euclideanDistance(pixels.get(i), pixels.get(j));
                 }
             }
@@ -43,24 +41,23 @@ public class ObjectiveFunctions {
     }
 
     /**
-     * Calculates the connectivity measure of an individual based on the given segments.
+     * Calculates the connectivity measure of an individual based on its current segments.
      * The connectivity measure is the sum of the inverse of the number of neighboring pixels
      * that belong to different segments.
      * Subject to MINIMIZATION.
      *
      * @param individual The individual representing the image.
-     * @param segments   The segments of the image.
      * @return The connectivity measure of the individual.
      */
-    public static double connectivityMeasure(Individual individual, List<Set<Integer>> segments) {
+    public static double connectivityMeasure(Individual individual) {
         double connectivityMeasure = 0.0;
-        List<List<Integer>> pixels = individual.getPixels();
-        int imageHeight = individual.getImageHeight();
-        int imageLength = individual.getImageLength();
+        List<List<Integer>> pixels = individual.getImage().getPixels();
+        int imageHeight = individual.getImage().getImageHeight();
+        int imageLength = individual.getImage().getImageLength();
 
         for (int i = 0; i < pixels.size(); i++) {
             for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
-                if (!inSameSegment(i, j, segments)) {
+                if (!inSameSegment(i, j, individual.getSegments())) {
                     connectivityMeasure += 1.0 / 8; // alernatively: (double) 1 / individual.getGraphDirection(i, j, imageHeight, imageLength);
                 }
             }
@@ -70,7 +67,7 @@ public class ObjectiveFunctions {
     }
 
     /**
-     * Calculates the overall deviation of an individual based on the given segments.
+     * Calculates the overall deviation of an individual based on its current segments.
      * The overall deviation is the sum of the Euclidean distances between each pixel in a segment
      * and the centroid of that segment.
      * Subject to MINIMIZATION.
@@ -79,11 +76,11 @@ public class ObjectiveFunctions {
      * @param segments   The segments of the image.
      * @return The overall deviation of the individual.
      */
-    public static double overallDeviation(Individual individual, List<Set<Integer>> segments) {
+    public static double overallDeviation(Individual individual) {
         double segmentDeviation = 0.0;
-        List<List<Integer>> pixels = individual.getPixels();
+        List<List<Integer>> pixels = individual.getImage().getPixels();
 
-        for (Set<Integer> segment : segments) {
+        for (Set<Integer> segment : individual.getSegments()) {
             for (Integer i : segment) {
                 segmentDeviation += euclideanDistance(pixels.get(i), getCentroid(individual, segment));
             }
@@ -122,7 +119,7 @@ public class ObjectiveFunctions {
         int redSum = 0;
         int greenSum = 0;
         int blueSum = 0;
-        List<List<Integer>> pixels = individual.getPixels();
+        List<List<Integer>> pixels = individual.getImage().getPixels();
 
         for (Integer i : segment) {
             List<Integer> pixel = pixels.get(i);
@@ -154,23 +151,12 @@ public class ObjectiveFunctions {
 
     // main
     public static void main(String[] args) {
-        List<List<Integer>> pixels = List.of(
-            List.of(1, 2, 3),
-            List.of(4, 5, 6),
-            List.of(7, 8, 9),
-            List.of(10, 11, 12)
-        );
-        int imageHeight = 2;
-        int imageLength = 2;
-        Individual individual = new Individual(pixels, imageHeight, imageLength);
-        List<Set<Integer>> segments = new ArrayList<>();
-        Set<Integer> segment1 = Set.of(0, 1);
-        Set<Integer> segment2 = Set.of(2, 3);
-        segments.add(segment1);
-        segments.add(segment2);
-        System.out.println(edgeValue(individual, segments));
-        System.out.println(connectivityMeasure(individual, segments));
-        System.out.println(overallDeviation(individual, segments));
+        String imagePath = "training_images/118035/Test image.jpg";
+        Image image = new Image(imagePath);
+        Individual individual = new Individual(image);
+        System.out.println(edgeValue(individual));
+        System.out.println(connectivityMeasure(individual));
+        System.out.println(overallDeviation(individual));
     }
 }
 
