@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+import java.util.Stack;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Arrays;
 
 /**
  * Represents an individual in the population. Each individual has a graph representation (undirected)
@@ -63,6 +67,10 @@ public class Individual {
      */
     public List<Integer> getChromosome() {
         return this.chromosome;
+    }
+
+    public void setChromosome(List<Integer> chromosome) {
+        this.chromosome = chromosome;
     }
 
     /**
@@ -223,5 +231,115 @@ public class Individual {
         }
 
         return neighbors;
+    }
+
+    public List<Set<Integer>> getSegments() {
+        Map<Integer, Set<Integer>> pixelToSegment = new HashMap<>();
+        for (int i = 0; i < chromosome.size(); i++) {
+            if (!pixelToSegment.containsKey(i)) {
+                Set<Integer> segment = new HashSet<>();
+                Stack<Integer> stack = new Stack<>();
+                stack.push(i);
+    
+                while (!stack.isEmpty()) {
+                    int current = stack.pop();
+                    segment.add(current);
+    
+                    // Add neighbors to the stack based on the value in the chromosome
+                    int neighbor = getNeighborFromGraph(current, this.imageHeight, this.imageLength, chromosome.get(current));
+                    if (neighbor != -1 && !segment.contains(neighbor)) {
+                        stack.push(neighbor);
+                    }
+    
+                    // If the current pixel is connected to an existing segment, merge the segments
+                    if (neighbor != -1 && pixelToSegment.containsKey(neighbor)) {
+                        segment.addAll(pixelToSegment.get(neighbor));
+                        pixelToSegment.put(neighbor, segment);
+                    }
+                }
+    
+                // Add the segment to the map for each pixel in the segment
+                for (int pixel : segment) {
+                    pixelToSegment.put(pixel, segment);
+                }
+            }
+        }
+    
+        // Create a list of unique segments from the map values
+        List<Set<Integer>> segments = new ArrayList<>(new HashSet<>(pixelToSegment.values()));
+    
+        return segments;
+    }
+
+    private int getNeighborFromGraph(int pixelIndex, int imageHeight, int imageLength, int direction) {
+        int row = pixelIndex / imageLength;
+        int col = pixelIndex % imageLength;
+
+        switch (direction) {
+            case 1: // right
+                if (col + 1 < imageLength) {
+                    return pixelIndex + 1;
+                }
+                break;
+            case 2: // left
+                if (col - 1 >= 0) {
+                    return pixelIndex - 1;
+                }
+                break;
+            case 3: // up
+                if (row - 1 >= 0) {
+                    return pixelIndex - imageLength;
+                }
+                break;
+            case 4: // down
+                if (row + 1 < imageHeight) {
+                    return pixelIndex + imageLength;
+                }
+                break;
+            case 5: // top right
+                if (row - 1 >= 0 && col + 1 < imageLength) {
+                    return pixelIndex - imageLength + 1;
+                }
+                break;
+            case 6: // bottom right
+                if (row + 1 < imageHeight && col + 1 < imageLength) {
+                    return pixelIndex + imageLength + 1;
+                }
+                break;
+            case 7: // top left
+                if (row - 1 >= 0 && col - 1 >= 0) {
+                    return pixelIndex - imageLength - 1;
+                }
+                break;
+            case 8: // bottom left
+                if (row + 1 < imageHeight && col - 1 >= 0) {
+                    return pixelIndex + imageLength - 1;
+                }
+                break;
+            default:
+                return -1;
+        }
+
+        return -1;
+    }
+
+    public static void main(String[] args) {
+        List<List<Integer>> pixels = List.of(
+            List.of(1, 2, 3),
+            List.of(4, 5, 6),
+            List.of(7, 8, 9),
+            List.of(10, 11, 12)
+            // List.of(7, 8, 9),
+            // List.of(10, 11, 12)
+        );
+        int imageHeight = 2;
+        int imageLength = 2;
+        Individual individual = new Individual(pixels, imageHeight, imageLength);
+        // List<Integer> chromosome = individual.getChromosome();
+        // System.out.println(chromosome);
+        List<Integer> chromosome = List.of(0, 8, 1, 7);
+        individual.setChromosome(chromosome);
+        List<Set<Integer>> segments = individual.getSegments();
+        System.out.println(segments);
     }
 }
