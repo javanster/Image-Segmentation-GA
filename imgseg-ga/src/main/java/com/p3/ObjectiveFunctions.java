@@ -145,9 +145,9 @@ public class ObjectiveFunctions {
      * @param population The population of individuals.
      * @return Map where the keys are individuals and the values are their Pareto ranks.
      */
-    public static Map<Individual, Integer> getParetoRanks(Population population) {
+    public static Map<Individual, Integer> getParetoRanks(List<Individual> individuals) {
         Map<Individual, Integer> paretoRanksMap = new HashMap<>();
-        List<Individual> remainingIndividuals = new ArrayList<>(population.getIndividuals());
+        List<Individual> remainingIndividuals = new ArrayList<>(individuals);
         int rank = 0;
     
         while (!remainingIndividuals.isEmpty()) {
@@ -227,7 +227,7 @@ public class ObjectiveFunctions {
         System.out.println(overallDeviation(individual));
 
         Population population = new Population(20, imagePath);
-        Map<Individual, Integer> paretoRanks = getParetoRanks(population);
+        Map<Individual, Integer> paretoRanks = getParetoRanks(population.getIndividuals());
         List<Individual> paretoRank1Individuals = new ArrayList<>();
         List<Individual> paretoRank2Individuals = new ArrayList<>();
         for (Individual ind : paretoRanks.keySet()) {
