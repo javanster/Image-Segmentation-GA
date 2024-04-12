@@ -1,4 +1,8 @@
 package com.p3;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -135,6 +139,85 @@ public class ObjectiveFunctions {
             Math.pow(pixel1.get(2) - pixel2.get(2), 2));
     }
 
+    /**
+     * Returns a map where the keys are individuals and the values are their corresponding Pareto ranks.
+     *
+     * @param population The population of individuals.
+     * @return Map where the keys are individuals and the values are their Pareto ranks.
+     */
+    public static Map<Individual, Integer> getParetoRanks(Population population) {
+        Map<Individual, Integer> paretoRanksMap = new HashMap<>();
+        List<Individual> remainingIndividuals = new ArrayList<>(population.getIndividuals());
+        int rank = 0;
+    
+        while (!remainingIndividuals.isEmpty()) {
+            Set<Individual> paretoFront = new HashSet<>();
+            Iterator<Individual> iterator = remainingIndividuals.iterator();
+    
+            while (iterator.hasNext()) {
+                Individual current = iterator.next();
+                boolean isDominated = false;
+    
+                for (Individual other : remainingIndividuals) {
+                    if (current != other && dominates(other, current)) {
+                        isDominated = true;
+                        break;
+                    }
+                }
+    
+                if (!isDominated) {
+                    paretoFront.add(current);
+                    paretoRanksMap.put(current, rank);
+                }
+            }
+    
+            // Remove individuals from the remaining list after identifying the Pareto front
+            remainingIndividuals.removeAll(paretoFront);
+            rank++;
+        }
+    
+        return paretoRanksMap;
+    }
+    
+
+    /**
+     * Checks if individual1 dominates individual2 based on all three objective functions.
+     *
+     * @param individual1 The first individual.
+     * @param individual2 The second individual.
+     * @return True if individual1 dominates individual2, false otherwise.
+     */
+    private static boolean dominates(Individual individual1, Individual individual2) {
+        double edgeValue1 = edgeValue(individual1);
+        double edgeValue2 = edgeValue(individual2);
+        double connectivityMeasure1 = connectivityMeasure(individual1);
+        double connectivityMeasure2 = connectivityMeasure(individual2);
+        double overallDeviation1 = overallDeviation(individual1);
+        double overallDeviation2 = overallDeviation(individual2);
+
+        // Check if individual1 dominates individual2 based on all three objectives
+        return (edgeValue1 >= edgeValue2 && connectivityMeasure1 <= connectivityMeasure2 && overallDeviation1 <= overallDeviation2) &&
+                (edgeValue1 > edgeValue2 || connectivityMeasure1 < connectivityMeasure2 || overallDeviation1 < overallDeviation2);
+    }
+
+    /**
+     * Checks if an individual is dominated by any other individual in a list of individuals.
+     *
+     * @param individual The individual to be checked.
+     * @param individuals The list of individuals to be compared against.
+     * @return True if the individual is dominated by any other individual in the list, false otherwise.
+     */
+    private static boolean isDominated(Individual individual1, List<Individual> individuals) {
+        for (Individual individual2 : individuals) {
+            if (individual1 != individual2 && dominates(individual2, individual1)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
@@ -142,6 +225,22 @@ public class ObjectiveFunctions {
         System.out.println(edgeValue(individual));
         System.out.println(connectivityMeasure(individual));
         System.out.println(overallDeviation(individual));
+
+        Population population = new Population(20, imagePath);
+        Map<Individual, Integer> paretoRanks = getParetoRanks(population);
+        List<Individual> paretoRank1Individuals = new ArrayList<>();
+        List<Individual> paretoRank2Individuals = new ArrayList<>();
+        for (Individual ind : paretoRanks.keySet()) {
+            if (paretoRanks.get(ind) == 1) {
+                paretoRank1Individuals.add(ind);
+            } else if (paretoRanks.get(ind) == 2) {
+                paretoRank2Individuals.add(ind);
+            }
+        }
+        System.out.println(paretoRanks.keySet().size());
+        for (Individual ind : paretoRank1Individuals) {
+            System.out.println(isDominated(ind, paretoRank2Individuals));
+        }
     }
 }
 
