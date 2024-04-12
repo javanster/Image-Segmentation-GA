@@ -9,8 +9,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
 import java.util.HashSet;
-import java.util.Optional;
-import java.util.Arrays;
 
 /**
  * Represents an individual in the population. Each individual has a graph representation (undirected)
@@ -32,16 +30,52 @@ import java.util.Arrays;
 public class Individual {
     
     private List<Integer> chromosome;
-    private List<List<Integer>> pixels;
-    private int imageHeight;
-    private int imageLength;
+    private List<Set<Integer>> segments;
+    private Image image;
 
 
-    public Individual(List<List<Integer>> pixels, int imageHeight, int imageLength) {
+    public Individual(Image image) {
+        this.image = image;
+        int imageHeight = image.getImageHeight();
+        int imageLength = image.getImageLength();
 
-        this.pixels = pixels;
-        this.imageHeight = imageHeight;
-        this.imageLength = imageLength;
+        Map<Set<Integer>, Double> edgeWeights = this.getEdgeWeights(image);
+        this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength);
+        this.setSegments();
+    }
+
+    /**
+     * Returns the chromosome of the individual.
+     * 
+     * @return The chromosome of the individual.
+     */
+    public List<Integer> getChromosome() {
+        return this.chromosome;
+    }
+
+    /**
+     * Returns the segments of the individual.
+     * 
+     * @return The segments of the individual.
+     */
+    public List<Set<Integer>> getSegments() {
+        return this.segments;
+    }
+
+    /**
+     * Returns the image of the individual.
+     * 
+     * @return The image of the individual.
+     */
+    public Image getImage() {
+        return this.image;
+    }
+
+    private Map<Set<Integer>, Double> getEdgeWeights(Image image) {
+        List<List<Integer>> pixels = image.getPixels();
+        int imageHeight = image.getImageHeight();
+        int imageLength = image.getImageLength();
+
         Map<Set<Integer>, Double> edgeWeights = new HashMap<>();
 
         for (int i = 0; i < pixels.size(); i++) {
@@ -57,47 +91,7 @@ public class Individual {
             }
         }
 
-        this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength);
-    }
-
-    /**
-     * Returns the chromosome of the individual.
-     * 
-     * @return The chromosome of the individual.
-     */
-    public List<Integer> getChromosome() {
-        return this.chromosome;
-    }
-
-    public void setChromosome(List<Integer> chromosome) {
-        this.chromosome = chromosome;
-    }
-
-    /**
-     * Returns the pixels of the image.
-     * 
-     * @return The pixels of the image.
-     */
-    public List<List<Integer>> getPixels() {
-        return this.pixels;
-    }
-
-    /**
-     * Returns the height of the image in pixels.
-     * 
-     * @return The height of the image in pixels.
-     */
-    public int getImageHeight() {
-        return this.imageHeight;
-    }
-
-    /**
-     * Returns the length of the image in pixels.
-     * 
-     * @return The length of the image in pixels.
-     */
-    public int getImageLength() {
-        return this.imageLength;
+        return edgeWeights;
     }
 
     /**
@@ -229,11 +223,10 @@ public class Individual {
                 }
             }
         }
-
         return neighbors;
     }
 
-    public List<Set<Integer>> getSegments() {
+    public void setSegments() {
         Map<Integer, Set<Integer>> pixelToSegment = new HashMap<>();
         for (int i = 0; i < chromosome.size(); i++) {
             if (!pixelToSegment.containsKey(i)) {
@@ -246,7 +239,7 @@ public class Individual {
                     segment.add(current);
     
                     // Add neighbors to the stack based on the value in the chromosome
-                    int neighbor = getNeighborFromGraph(current, this.imageHeight, this.imageLength, chromosome.get(current));
+                    int neighbor = getNeighborFromGraph(current, this.image.getImageHeight(), this.image.getImageLength(), chromosome.get(current));
                     if (neighbor != -1 && !segment.contains(neighbor)) {
                         stack.push(neighbor);
                     }
@@ -268,7 +261,7 @@ public class Individual {
         // Create a list of unique segments from the map values
         List<Set<Integer>> segments = new ArrayList<>(new HashSet<>(pixelToSegment.values()));
     
-        return segments;
+        this.segments = segments;
     }
 
     private int getNeighborFromGraph(int pixelIndex, int imageHeight, int imageLength, int direction) {
@@ -324,21 +317,11 @@ public class Individual {
     }
 
     public static void main(String[] args) {
-        List<List<Integer>> pixels = List.of(
-            List.of(1, 2, 3),
-            List.of(4, 5, 6),
-            List.of(7, 8, 9),
-            List.of(10, 11, 12)
-            // List.of(7, 8, 9),
-            // List.of(10, 11, 12)
-        );
-        int imageHeight = 2;
-        int imageLength = 2;
-        Individual individual = new Individual(pixels, imageHeight, imageLength);
+        String imagePath = "training_images/118035/Test image.jpg";
+        Image image = new Image(imagePath);
+        Individual individual = new Individual(image);
         // List<Integer> chromosome = individual.getChromosome();
         // System.out.println(chromosome);
-        List<Integer> chromosome = List.of(0, 8, 1, 7);
-        individual.setChromosome(chromosome);
         List<Set<Integer>> segments = individual.getSegments();
         System.out.println(segments);
     }
