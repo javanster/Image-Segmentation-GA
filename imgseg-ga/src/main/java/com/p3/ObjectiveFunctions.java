@@ -145,38 +145,40 @@ public class ObjectiveFunctions {
      * @param population The population of individuals.
      * @return Map where the keys are individuals and the values are their Pareto ranks.
      */
-    public static Map<Individual, Integer> getParetoRanks(List<Individual> individuals) {
+    public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
         Map<Individual, Integer> paretoRanksMap = new HashMap<>();
         List<Individual> remainingIndividuals = new ArrayList<>(individuals);
         int rank = 0;
-    
+        List<List<Individual>> paretoFronts = new ArrayList<>();
+
         while (!remainingIndividuals.isEmpty()) {
             Set<Individual> paretoFront = new HashSet<>();
             Iterator<Individual> iterator = remainingIndividuals.iterator();
-    
+
             while (iterator.hasNext()) {
                 Individual current = iterator.next();
                 boolean isDominated = false;
-    
+
                 for (Individual other : remainingIndividuals) {
                     if (current != other && dominates(other, current)) {
                         isDominated = true;
                         break;
                     }
                 }
-    
+
                 if (!isDominated) {
                     paretoFront.add(current);
                     paretoRanksMap.put(current, rank);
                 }
             }
-    
+
             // Remove individuals from the remaining list after identifying the Pareto front
             remainingIndividuals.removeAll(paretoFront);
+            paretoFronts.add(new ArrayList<>(paretoFront));
             rank++;
         }
-    
-        return paretoRanksMap;
+
+        return paretoFronts;
     }
     
 
@@ -203,7 +205,7 @@ public class ObjectiveFunctions {
     /**
      * Checks if an individual is dominated by any other individual in a list of individuals.
      *
-     * @param individual The individual to be checked.
+     * @param individual1 The individual to be checked.
      * @param individuals The list of individuals to be compared against.
      * @return True if the individual is dominated by any other individual in the list, false otherwise.
      */
@@ -226,15 +228,15 @@ public class ObjectiveFunctions {
      * @param population The population of individuals.
      * @return Map where the keys are individuals and the values are their crowding distances.
      */
-    public static Map<Individual, Double> getCrowdingDistance(Population population) {
+    public static Map<Individual, Double> getCrowdingDistances(List<Individual> individuals) {
         Map<Individual, Double> distances = new HashMap<>(); 
-        int l = population.getIndividuals().size();
+        int l = individuals.size();
 
-        for (Individual individual : population.getIndividuals()) {
+        for (Individual individual : individuals) {
             distances.put(individual, 0.0);
         }
         
-        List<Individual> individualsCopy = new ArrayList<>(population.getIndividuals());
+        List<Individual> individualsCopy = new ArrayList<>(individuals);
 
         // Edge value
         individualsCopy.sort((i1, i2) -> Double.compare(edgeValue(i1), edgeValue(i2))); // worst first, i.e. min first
@@ -289,23 +291,16 @@ public class ObjectiveFunctions {
         System.out.println(overallDeviation(individual));
 
         Population population = new Population(20, imagePath);
-        Map<Individual, Integer> paretoRanks = getParetoRanks(population.getIndividuals());
-        List<Individual> paretoRank1Individuals = new ArrayList<>();
-        List<Individual> paretoRank2Individuals = new ArrayList<>();
-        for (Individual ind : paretoRanks.keySet()) {
-            if (paretoRanks.get(ind) == 1) {
-                paretoRank1Individuals.add(ind);
-            } else if (paretoRanks.get(ind) == 2) {
-                paretoRank2Individuals.add(ind);
-            }
+        List<List<Individual>> paretoRanks = getParetoFronts(population.getIndividuals());
+        List<Individual> paretoFront = paretoRanks.get(0);
+        List<Individual> secondParetoFront = paretoRanks.get(1);
+        for (Individual p : paretoFront) {
+            System.out.println(isDominated(p, secondParetoFront));
         }
-        System.out.println(paretoRanks.keySet().size());
-        for (Individual ind : paretoRank1Individuals) {
-            System.out.println(isDominated(ind, paretoRank2Individuals));
-        }
+        
 
         System.out.println("Getting crowding distances");
-        Map<Individual, Double> crowdingDistances = getCrowdingDistance(population);
+        Map<Individual, Double> crowdingDistances = getCrowdingDistances(population.getIndividuals());
 
         System.out.println(crowdingDistances);
 
