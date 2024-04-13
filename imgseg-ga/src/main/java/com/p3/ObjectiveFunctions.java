@@ -216,6 +216,68 @@ public class ObjectiveFunctions {
         return false;
     }
 
+    /**
+     * Returns a map where the keys are individuals and the values are their corresponding crowding distances.
+     * 
+     * Based on:
+     * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
+     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), 185. https://doi.org/10.1109/4235.996017 
+     * 
+     * @param population The population of individuals.
+     * @return Map where the keys are individuals and the values are their crowding distances.
+     */
+    public static Map<Individual, Double> getCrowdingDistance(Population population) {
+        Map<Individual, Double> distances = new HashMap<>(); 
+        int l = population.getIndividuals().size();
+
+        for (Individual individual : population.getIndividuals()) {
+            distances.put(individual, 0.0);
+        }
+        
+        List<Individual> individualsCopy = new ArrayList<>(population.getIndividuals());
+
+        // Edge value
+        individualsCopy.sort((i1, i2) -> Double.compare(edgeValue(i1), edgeValue(i2))); // worst first, i.e. min first
+        distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
+        distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
+        double minEdgeValue = edgeValue(individualsCopy.get(0));
+        double maxEdgeValue = edgeValue(individualsCopy.get(l - 1));
+        for (int i = 1; i < l - 1; i++) {
+            double distanceValue = distances.get(individualsCopy.get(i));
+            double edgeValueOfNext = edgeValue(individualsCopy.get(i + 1));
+            double edgeValueOfPrev = edgeValue(individualsCopy.get(i - 1));
+            distances.replace(individualsCopy.get(i), (distanceValue + edgeValueOfNext - edgeValueOfPrev) / maxEdgeValue - minEdgeValue);
+        }
+
+        // Connectivity measure
+        individualsCopy.sort((i1, i2) -> Double.compare(connectivityMeasure(i2), connectivityMeasure(i1))); // worst first, i.e. max value first
+        distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
+        distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
+        double minConnectivityMeasure = connectivityMeasure(individualsCopy.get(l - 1));
+        double maxConnectivityMeasure = connectivityMeasure(individualsCopy.get(0));
+        for (int i = 1; i < l - 1; i++) {
+            double distanceValue = distances.get(individualsCopy.get(i));
+            double connectivityMeasureOfNext = connectivityMeasure(individualsCopy.get(i + 1));
+            double connectivityMeasureOfPrev = connectivityMeasure(individualsCopy.get(i - 1));
+            distances.replace(individualsCopy.get(i), (distanceValue + connectivityMeasureOfNext - connectivityMeasureOfPrev) / maxConnectivityMeasure - minConnectivityMeasure);
+        }
+
+        // Overall deviation
+        individualsCopy.sort((i1, i2) -> Double.compare(overallDeviation(i2), overallDeviation(i1))); // worst first, i.e. max value first
+        distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
+        distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
+        double minOverallDeviationValue = overallDeviation(individualsCopy.get(l - 1));
+        double maxOverallDeviationValue = overallDeviation(individualsCopy.get(0));
+        for (int i = 1; i < l - 1; i++) {
+            double distanceValue = distances.get(individualsCopy.get(i));
+            double overallDeviationValueNext = overallDeviation(individualsCopy.get(i + 1));
+            double overallDeviationValuePrev = overallDeviation(individualsCopy.get(i - 1));
+            distances.replace(individualsCopy.get(i), (distanceValue + overallDeviationValueNext - overallDeviationValuePrev) / maxOverallDeviationValue - minOverallDeviationValue);
+        }
+
+        return distances;
+    }
+
     
 
     public static void main(String[] args) {
@@ -241,6 +303,12 @@ public class ObjectiveFunctions {
         for (Individual ind : paretoRank1Individuals) {
             System.out.println(isDominated(ind, paretoRank2Individuals));
         }
+
+        System.out.println("Getting crowding distances");
+        Map<Individual, Double> crowdingDistances = getCrowdingDistance(population);
+
+        System.out.println(crowdingDistances);
+
     }
 }
 
