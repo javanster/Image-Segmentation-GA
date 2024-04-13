@@ -1,7 +1,6 @@
 package com.p3;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -146,13 +145,11 @@ public class ObjectiveFunctions {
      * @return Map where the keys are individuals and the values are their Pareto ranks.
      */
     public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
-        Map<Individual, Integer> paretoRanksMap = new HashMap<>();
         List<Individual> remainingIndividuals = new ArrayList<>(individuals);
-        int rank = 0;
         List<List<Individual>> paretoFronts = new ArrayList<>();
 
         while (!remainingIndividuals.isEmpty()) {
-            Set<Individual> paretoFront = new HashSet<>();
+            List<Individual> paretoFront = new ArrayList<>();
             Iterator<Individual> iterator = remainingIndividuals.iterator();
 
             while (iterator.hasNext()) {
@@ -168,14 +165,12 @@ public class ObjectiveFunctions {
 
                 if (!isDominated) {
                     paretoFront.add(current);
-                    paretoRanksMap.put(current, rank);
                 }
             }
 
             // Remove individuals from the remaining list after identifying the Pareto front
             remainingIndividuals.removeAll(paretoFront);
-            paretoFronts.add(new ArrayList<>(paretoFront));
-            rank++;
+            paretoFronts.add(paretoFront);
         }
 
         return paretoFronts;
@@ -290,12 +285,16 @@ public class ObjectiveFunctions {
         System.out.println(connectivityMeasure(individual));
         System.out.println(overallDeviation(individual));
 
-        Population population = new Population(20, imagePath);
+        Population population = new Population(30, imagePath);
         List<List<Individual>> paretoRanks = getParetoFronts(population.getIndividuals());
         List<Individual> paretoFront = paretoRanks.get(0);
         List<Individual> secondParetoFront = paretoRanks.get(1);
+        List<Individual> thirdParetoFront = paretoRanks.get(2);
         for (Individual p : paretoFront) {
             System.out.println(isDominated(p, secondParetoFront));
+        }
+        for (Individual p : secondParetoFront) {
+            System.out.println(isDominated(p, thirdParetoFront));
         }
         
 
