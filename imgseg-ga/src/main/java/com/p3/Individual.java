@@ -53,6 +53,13 @@ public class Individual {
         this.setSegmentMap();
     }
 
+    public Individual(List<Integer> chromosome, Individual parent) {
+        this.chromosome = chromosome;
+        this.image = parent.getImage();
+        this.segments = parent.getSegments();
+        this.segmentMap = parent.getSegmentMap();
+    }
+
     /**
      * Returns the chromosome of the individual.
      * 
