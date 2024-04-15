@@ -7,8 +7,21 @@ import java.util.Random;
 
 import com.p3.interfaces.CrossoverHandler;
 
-public class TwoPointCrossover implements CrossoverHandler{
+/**
+ * A class that performs two-point crossover on two individuals.
+ * 
+ * Based on:
+ * Eiben & Smith, 2015, p. 53.
+ *
+ * @param parent1 The first parent.
+ * @param parent2 The second parent.
+ * @return An array of two children.
+ */
+public class TwoPointCrosser implements CrossoverHandler{
 
+    /**
+     * Crosses two individuals to create two children, using two-point crossover.
+     */
     @Override
     public Individual[] cross(Individual parent1, Individual parent2) {
         Random random = new Random();
