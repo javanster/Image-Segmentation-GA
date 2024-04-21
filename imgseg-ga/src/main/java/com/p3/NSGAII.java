@@ -32,13 +32,14 @@ public class NSGAII {
         System.out.println("Running NSGA-II");
         Population population = new Population(populationSize, imagePath, lowerBound, upperBound);
         System.out.println("Population generated");
+        System.out.println();
 
         Individual bestIndividual = population.getIndividuals().get(0);
-        // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageHeight(), bestIndividual.getImage().getImageLength(), "test.png", bestIndividual);
         // System.out.println(bestIndividual.getSegments());
         System.out.println("Starter individual:");
         System.out.println("Edge: " + ObjectiveFunctions.edgeValue(bestIndividual) + ", Connectivity: " + ObjectiveFunctions.connectivityMeasure(bestIndividual) + ", Deviation: " + ObjectiveFunctions.overallDeviation(bestIndividual));
         System.out.println("Number of segments in first individual: " + bestIndividual.getSegments().size());
+        System.out.println();
 
         for (int k = 0; k < populationSize; k++) {
             ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter-" + k + ".png", population.getIndividuals().get(k));
@@ -62,9 +63,7 @@ public class NSGAII {
                 System.out.println("Equal chromosomes in gen " + i + ": " + total);
             }
 
-
             for (int j = 0; j < (int) (lambda / 2); j++) {
-                System.out.println("Generation " + i + ", individuals " + (2*j + 1) + " and " + (2*j + 2) + " of " + lambda);
                 // pick two random unique numbers [0, populationSize) as parents
                 int parent1Index = (int) (Math.random() * populationSize);
                 int parent2Index = (int) (Math.random() * populationSize);
@@ -134,7 +133,8 @@ public class NSGAII {
             System.out.print("Best individual in generation " + i + ": ");
             System.out.println("Edge: " + ObjectiveFunctions.edgeValue(bestIndividual) + ", Connectivity: " + ObjectiveFunctions.connectivityMeasure(bestIndividual) + ", Deviation: " + ObjectiveFunctions.overallDeviation(bestIndividual));
             System.out.println("Number of segments: " + bestIndividual.getSegments().size());
-
+            System.out.println();
+            
             for (int k = 0; k < populationSize; k++) {
                 ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k));
             }
