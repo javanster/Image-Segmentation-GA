@@ -49,8 +49,6 @@ public class NSGAII {
         }
         // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter.png", bestIndividual);
 
-        // System.exit(0);
-        // while not (termination condition)
         for (int i = 0; i < 10; i++) {
             List<Individual> individuals = population.getIndividuals();
 
@@ -104,13 +102,6 @@ public class NSGAII {
             // evaluate the population
             List<List<Individual>> fronts = ObjectiveFunctions.getParetoFronts(individuals);
             Map<Individual, Double> crowdingDistance = ObjectiveFunctions.getCrowdingDistances(individuals);
-
-            // System.out.println("Checking pareto frots:");
-            // for (int j = 0; j < fronts.size(); j++) {
-            //     System.out.println("Edge: " + ObjectiveFunctions.edgeValue(fronts.get(j).get(0)) + ", Connectivity: " + ObjectiveFunctions.connectivityMeasure(fronts.get(j).get(0)) + ", Deviation: " + ObjectiveFunctions.overallDeviation(fronts.get(j).get(0)));
-            // }
-
-            // System.exit(0);
 
             System.out.println("Selecting best individuas of generation " + i);
 

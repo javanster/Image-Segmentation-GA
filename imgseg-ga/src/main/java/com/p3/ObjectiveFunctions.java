@@ -48,7 +48,6 @@ public class ObjectiveFunctions {
         return edgeValue;
     }
 
-
     /**
      * Calculates the connectivity measure of an individual based on its current segments.
      * The connectivity measure is the sum of the inverse of the number of neighboring pixels
@@ -140,45 +139,12 @@ public class ObjectiveFunctions {
             Math.pow(pixel1.get(2) - pixel2.get(2), 2));
     }
 
-    // /**
-    //  * Returns a map where the keys are individuals and the values are their corresponding Pareto ranks.
-    //  *
-    //  * @param population The population of individuals.
-    //  * @return Map where the keys are individuals and the values are their Pareto ranks.
-    //  */
-    // public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
-    //     List<Individual> remainingIndividuals = new ArrayList<>(individuals);
-    //     List<List<Individual>> paretoFronts = new ArrayList<>();
-
-    //     while (!remainingIndividuals.isEmpty()) {
-    //         List<Individual> paretoFront = new ArrayList<>();
-    //         Iterator<Individual> iterator = remainingIndividuals.iterator();
-
-    //         while (iterator.hasNext()) {
-    //             Individual current = iterator.next();
-    //             boolean isDominated = false;
-
-    //             for (Individual other : remainingIndividuals) {
-    //                 if (current != other && dominates(other, current)) {
-    //                     isDominated = true;
-    //                     break;
-    //                 }
-    //             }
-
-    //             if (!isDominated) {
-    //                 paretoFront.add(current);
-    //             }
-    //         }
-
-    //         // Remove individuals from the remaining list after identifying the Pareto front
-    //         remainingIndividuals.removeAll(paretoFront);
-    //         paretoFronts.add(paretoFront);
-    //     }
-
-    //     return paretoFronts;
-    // }
-
-    // a faster implementation of the above method
+    /**
+     * Calculates the Pareto fronts for a given list of individuals.
+     *
+     * @param individuals the list of individuals
+     * @return a list of lists, where each inner list represents a Pareto front
+     */
     public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
         int n = individuals.size();
         int[] dominatedCount = new int[n];

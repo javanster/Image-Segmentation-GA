@@ -111,22 +111,15 @@ public class ImageReader {
         }
     }
 
-    private static boolean isBorderPixel(int x, int y, int width, int height, Set<Integer> segment) {
-        int[] dx = {-1, 0, 1, 0};
-        int[] dy = {0, 1, 0, -1};
-
-        for (int i = 0; i < 4; i++) {
-            int nx = x + dx[i];
-            int ny = y + dy[i];
-
-            if (nx >= 0 && nx < width && ny >= 0 && ny < height && !segment.contains(ny * width + nx)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
+    /**
+     * Writes an image with segments to the specified output path.
+     *
+     * @param pixels      The list of pixels representing the image.
+     * @param width       The width of the image.
+     * @param height      The height of the image.
+     * @param outputPath  The path where the image will be saved.
+     * @param individual  The individual containing the segments.
+     */
     public static void writeImageWithSegments(List<List<Integer>> pixels, int width, int height, String outputPath, Individual individual) {
         List<Set<Integer>> segments = individual.getSegments();
 
@@ -176,7 +169,6 @@ public class ImageReader {
         }
     }
 
-    // main
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         List<List<Integer>> pixels = ImageReader.getImagePixels(imagePath);

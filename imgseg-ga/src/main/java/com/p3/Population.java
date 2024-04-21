@@ -14,18 +14,16 @@ public class Population {
     
     private List<Individual> individuals;
 
-    // public Population(int populationSize, String imageFilePath) {
-    //     List<Individual> individuals = new ArrayList<>();
-    //     Image image = new Image(imageFilePath);
-    //     for (int i = 0; i < populationSize; i++) {
-    //         System.out.println("Creating individual " + i + 1 + " of " + populationSize);
-    //         individuals.add(new Individual(image));
-    //     }
-    //     this.individuals = individuals;
-    // }
-
-    // a variation of the constructor that takes in a lower and upper bound for the number of segments
-    // also uses a thread pool to create individuals in parallel
+    /**
+     * Constructs a Population object with the specified parameters.
+     *
+     * @param populationSize the size of the population
+     * @param imageFilePath the file path of the image
+     * @param lowerBound the lower bound for the number of segments
+     * @param upperBound the upper bound for the number of segments
+     * @throws InterruptedException if the execution is interrupted
+     * @throws ExecutionException if an error occurs during execution
+     */
     public Population(int populationSize, String imageFilePath, int lowerBound, int upperBound) throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(3);
         List<Future<Individual>> futures = new ArrayList<>();
