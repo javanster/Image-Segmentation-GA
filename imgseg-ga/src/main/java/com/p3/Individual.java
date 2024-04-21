@@ -8,9 +8,7 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.Set;
-import java.util.Stack;
 import java.util.HashSet;
-import java.util.Comparator;
 
 /**
  * Represents an individual in the population. Each individual has a graph representation (undirected)

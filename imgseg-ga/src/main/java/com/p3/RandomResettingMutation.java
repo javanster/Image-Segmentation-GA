@@ -4,7 +4,6 @@ import java.util.List;
 
 import com.p3.interfaces.MutationHandler;
 import java.util.Random;
-import java.util.ArrayList;
 
 public class RandomResettingMutation implements MutationHandler {
     

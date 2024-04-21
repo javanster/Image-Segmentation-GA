@@ -6,15 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-// import javax.media.jai.JAI;
-// import javax.media.jai.PlanarImage;
 import java.awt.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
-import java.io.File;
-import java.util.List;
 import java.util.Set;
-import javax.imageio.ImageIO;
 
 /**
  * The ImageReader class provides utility methods for reading and writing images.

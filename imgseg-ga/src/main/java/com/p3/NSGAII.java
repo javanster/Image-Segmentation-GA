@@ -3,13 +3,9 @@ package com.p3;
 import java.util.List;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import com.p3.interfaces.CrossoverHandler;
 
 public class NSGAII {
     
