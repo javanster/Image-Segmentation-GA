@@ -1,10 +1,12 @@
 package com.p3;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 
 /**
  * The ObjectiveFunctions class provides static methods for calculating objective function values
@@ -138,43 +140,129 @@ public class ObjectiveFunctions {
             Math.pow(pixel1.get(2) - pixel2.get(2), 2));
     }
 
-    /**
-     * Returns a map where the keys are individuals and the values are their corresponding Pareto ranks.
-     *
-     * @param population The population of individuals.
-     * @return Map where the keys are individuals and the values are their Pareto ranks.
-     */
+    // /**
+    //  * Returns a map where the keys are individuals and the values are their corresponding Pareto ranks.
+    //  *
+    //  * @param population The population of individuals.
+    //  * @return Map where the keys are individuals and the values are their Pareto ranks.
+    //  */
+    // public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
+    //     List<Individual> remainingIndividuals = new ArrayList<>(individuals);
+    //     List<List<Individual>> paretoFronts = new ArrayList<>();
+
+    //     while (!remainingIndividuals.isEmpty()) {
+    //         List<Individual> paretoFront = new ArrayList<>();
+    //         Iterator<Individual> iterator = remainingIndividuals.iterator();
+
+    //         while (iterator.hasNext()) {
+    //             Individual current = iterator.next();
+    //             boolean isDominated = false;
+
+    //             for (Individual other : remainingIndividuals) {
+    //                 if (current != other && dominates(other, current)) {
+    //                     isDominated = true;
+    //                     break;
+    //                 }
+    //             }
+
+    //             if (!isDominated) {
+    //                 paretoFront.add(current);
+    //             }
+    //         }
+
+    //         // Remove individuals from the remaining list after identifying the Pareto front
+    //         remainingIndividuals.removeAll(paretoFront);
+    //         paretoFronts.add(paretoFront);
+    //     }
+
+    //     return paretoFronts;
+    // }
+
+    // public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
+    //     // Sort individuals based on non-domination
+    //     individuals.sort((individual1, individual2) -> {
+    //         if (dominates(individual1, individual2)) {
+    //             return -1;
+    //         } else if (dominates(individual2, individual1)) {
+    //             return 1;
+    //         } else {
+    //             return 0;
+    //         }
+    //     });
+    
+    //     List<List<Individual>> paretoFronts = new ArrayList<>();
+    //     List<Individual> currentFront = new ArrayList<>();
+    //     currentFront.add(individuals.get(0));
+    
+    //     for (int i = 1; i < individuals.size(); i++) {
+    //         Individual current = individuals.get(i);
+    
+    //         // If the current individual is dominated by the last individual in the current front,
+    //         // it means we have found a new front.
+    //         if (dominates(currentFront.get(currentFront.size() - 1), current)) {
+    //             paretoFronts.add(currentFront);
+    //             currentFront = new ArrayList<>();
+    //         }
+    
+    //         currentFront.add(current);
+    //     }
+    
+    //     paretoFronts.add(currentFront);
+    
+    //     return paretoFronts;
+    // }
+
     public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
-        List<Individual> remainingIndividuals = new ArrayList<>(individuals);
-        List<List<Individual>> paretoFronts = new ArrayList<>();
-
-        while (!remainingIndividuals.isEmpty()) {
-            List<Individual> paretoFront = new ArrayList<>();
-            Iterator<Individual> iterator = remainingIndividuals.iterator();
-
-            while (iterator.hasNext()) {
-                Individual current = iterator.next();
-                boolean isDominated = false;
-
-                for (Individual other : remainingIndividuals) {
-                    if (current != other && dominates(other, current)) {
-                        isDominated = true;
-                        break;
+        int n = individuals.size();
+        int[] dominatedCount = new int[n];
+        List<Integer>[] dominates = new ArrayList[n];
+    
+        for (int i = 0; i < n; i++) {
+            dominates[i] = new ArrayList<>();
+            for (int j = 0; j < n; j++) {
+                if (i != j) {
+                    if (dominates(individuals.get(i), individuals.get(j))) {
+                        dominates[i].add(j);
+                    } else if (dominates(individuals.get(j), individuals.get(i))) {
+                        dominatedCount[i]++;
                     }
                 }
-
-                if (!isDominated) {
-                    paretoFront.add(current);
+            }
+        }
+    
+        List<List<Individual>> paretoFronts = new ArrayList<>();
+        while (true) {
+            List<Individual> paretoFront = new ArrayList<>();
+            for (int i = 0; i < n; i++) {
+                if (dominatedCount[i] == 0) {
+                    paretoFront.add(individuals.get(i));
+                    dominatedCount[i] = -1;
                 }
             }
-
-            // Remove individuals from the remaining list after identifying the Pareto front
-            remainingIndividuals.removeAll(paretoFront);
+    
+            if (paretoFront.isEmpty()) {
+                break;
+            }
+    
+            for (Individual individual : paretoFront) {
+                for (int i : dominates[individuals.indexOf(individual)]) {
+                    dominatedCount[i]--;
+                }
+            }
+    
             paretoFronts.add(paretoFront);
         }
 
+        // resetting objective values
+        for (List<Individual> front : paretoFronts) {
+            for (Individual individual : front) {
+                individual.resetObjectiveValues();
+            }
+        }
+    
         return paretoFronts;
     }
+    
     
 
     /**
@@ -185,17 +273,40 @@ public class ObjectiveFunctions {
      * @return True if individual1 dominates individual2, false otherwise.
      */
     private static boolean dominates(Individual individual1, Individual individual2) {
-        double edgeValue1 = edgeValue(individual1);
-        double edgeValue2 = edgeValue(individual2);
-        double connectivityMeasure1 = connectivityMeasure(individual1);
-        double connectivityMeasure2 = connectivityMeasure(individual2);
-        double overallDeviation1 = overallDeviation(individual1);
-        double overallDeviation2 = overallDeviation(individual2);
+        // double edgeValue1 = edgeValue(individual1);
+        // double edgeValue2 = edgeValue(individual2);
+        // double connectivityMeasure1 = connectivityMeasure(individual1);
+        // double connectivityMeasure2 = connectivityMeasure(individual2);
+        // double overallDeviation1 = overallDeviation(individual1);
+        // double overallDeviation2 = overallDeviation(individual2);
+
+        double edgeValue1 = individual1.getEdgeValue();
+        double edgeValue2 = individual2.getEdgeValue();
+        double connectivityMeasure1 = individual1.getConnectivityMeasure();
+        double connectivityMeasure2 = individual2.getConnectivityMeasure();
+        double overallDeviation1 = individual1.getOverallDeviation();
+        double overallDeviation2 = individual2.getOverallDeviation();
 
         // Check if individual1 dominates individual2 based on all three objectives
         return (edgeValue1 >= edgeValue2 && connectivityMeasure1 <= connectivityMeasure2 && overallDeviation1 <= overallDeviation2) &&
                 (edgeValue1 > edgeValue2 || connectivityMeasure1 < connectivityMeasure2 || overallDeviation1 < overallDeviation2);
     }
+
+    // private static boolean dominates(Individual individual1, Individual individual2) {
+    //     double edgeValue1 = edgeValue(individual1);
+    //     double edgeValue2 = edgeValue(individual2);
+    //     double connectivityMeasure1 = connectivityMeasure(individual1);
+    //     double connectivityMeasure2 = connectivityMeasure(individual2);
+    //     double overallDeviation1 = overallDeviation(individual1);
+    //     double overallDeviation2 = overallDeviation(individual2);
+    
+    //     // Check if individual1 dominates individual2 based on all three objectives
+    //     boolean dominatesInAllObjectives = (edgeValue1 >= edgeValue2 && connectivityMeasure1 <= connectivityMeasure2 && overallDeviation1 <= overallDeviation2);
+    //     boolean dominatesInAtLeastOneObjective = (edgeValue1 > edgeValue2 || connectivityMeasure1 < connectivityMeasure2 || overallDeviation1 < overallDeviation2);
+    
+    //     return dominatesInAllObjectives && dominatesInAtLeastOneObjective;
+    // }
+    
 
     /**
      * Checks if an individual is dominated by any other individual in a list of individuals.
@@ -234,58 +345,109 @@ public class ObjectiveFunctions {
         List<Individual> individualsCopy = new ArrayList<>(individuals);
 
         // Edge value
-        individualsCopy.sort((i1, i2) -> Double.compare(edgeValue(i1), edgeValue(i2))); // worst first, i.e. min first
+        // individualsCopy.sort((i1, i2) -> Double.compare(edgeValue(i1), edgeValue(i2))); // worst first, i.e. min first
+        individualsCopy.sort((i1, i2) -> Double.compare(i1.getEdgeValue(), i2.getEdgeValue())); // worst first, i.e. min first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minEdgeValue = edgeValue(individualsCopy.get(0));
-        double maxEdgeValue = edgeValue(individualsCopy.get(l - 1));
+        // double minEdgeValue = edgeValue(individualsCopy.get(0));
+        // double maxEdgeValue = edgeValue(individualsCopy.get(l - 1));
+        double minEdgeValue = individualsCopy.get(0).getEdgeValue();
+        double maxEdgeValue = individualsCopy.get(l - 1).getEdgeValue();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
-            double edgeValueOfNext = edgeValue(individualsCopy.get(i + 1));
-            double edgeValueOfPrev = edgeValue(individualsCopy.get(i - 1));
+            double edgeValueOfNext = individualsCopy.get(i + 1).getEdgeValue();
+            double edgeValueOfPrev = individualsCopy.get(i - 1).getEdgeValue();
             distances.replace(individualsCopy.get(i), (distanceValue + edgeValueOfNext - edgeValueOfPrev) / maxEdgeValue - minEdgeValue);
         }
 
         // Connectivity measure
-        individualsCopy.sort((i1, i2) -> Double.compare(connectivityMeasure(i2), connectivityMeasure(i1))); // worst first, i.e. max value first
+        // individualsCopy.sort((i1, i2) -> Double.compare(connectivityMeasure(i2), connectivityMeasure(i1))); // worst first, i.e. max value first
+        individualsCopy.sort((i1, i2) -> Double.compare(i2.getConnectivityMeasure(), i1.getConnectivityMeasure())); // worst first, i.e. max value first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minConnectivityMeasure = connectivityMeasure(individualsCopy.get(l - 1));
-        double maxConnectivityMeasure = connectivityMeasure(individualsCopy.get(0));
+        // double minConnectivityMeasure = connectivityMeasure(individualsCopy.get(l - 1));
+        // double maxConnectivityMeasure = connectivityMeasure(individualsCopy.get(0));
+        double minConnectivityMeasure = individualsCopy.get(l - 1).getConnectivityMeasure();
+        double maxConnectivityMeasure = individualsCopy.get(0).getConnectivityMeasure();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
-            double connectivityMeasureOfNext = connectivityMeasure(individualsCopy.get(i + 1));
-            double connectivityMeasureOfPrev = connectivityMeasure(individualsCopy.get(i - 1));
+            // double connectivityMeasureOfNext = connectivityMeasure(individualsCopy.get(i + 1));
+            // double connectivityMeasureOfPrev = connectivityMeasure(individualsCopy.get(i - 1));
+            double connectivityMeasureOfNext = individualsCopy.get(i + 1).getConnectivityMeasure();
+            double connectivityMeasureOfPrev = individualsCopy.get(i - 1).getConnectivityMeasure();
             distances.replace(individualsCopy.get(i), (distanceValue + connectivityMeasureOfNext - connectivityMeasureOfPrev) / maxConnectivityMeasure - minConnectivityMeasure);
         }
 
         // Overall deviation
-        individualsCopy.sort((i1, i2) -> Double.compare(overallDeviation(i2), overallDeviation(i1))); // worst first, i.e. max value first
+        // individualsCopy.sort((i1, i2) -> Double.compare(overallDeviation(i2), overallDeviation(i1))); // worst first, i.e. max value first
+        individualsCopy.sort((i1, i2) -> Double.compare(i2.getOverallDeviation(), i1.getOverallDeviation())); // worst first, i.e. max value first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minOverallDeviationValue = overallDeviation(individualsCopy.get(l - 1));
-        double maxOverallDeviationValue = overallDeviation(individualsCopy.get(0));
+        // double minOverallDeviationValue = overallDeviation(individualsCopy.get(l - 1));
+        // double maxOverallDeviationValue = overallDeviation(individualsCopy.get(0));
+        double minOverallDeviationValue = individualsCopy.get(l - 1).getOverallDeviation();
+        double maxOverallDeviationValue = individualsCopy.get(0).getOverallDeviation();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
-            double overallDeviationValueNext = overallDeviation(individualsCopy.get(i + 1));
-            double overallDeviationValuePrev = overallDeviation(individualsCopy.get(i - 1));
+            // double overallDeviationValueNext = overallDeviation(individualsCopy.get(i + 1));
+            // double overallDeviationValuePrev = overallDeviation(individualsCopy.get(i - 1));
+            double overallDeviationValueNext = individualsCopy.get(i + 1).getOverallDeviation();
+            double overallDeviationValuePrev = individualsCopy.get(i - 1).getOverallDeviation();
             distances.replace(individualsCopy.get(i), (distanceValue + overallDeviationValueNext - overallDeviationValuePrev) / maxOverallDeviationValue - minOverallDeviationValue);
         }
 
         return distances;
     }
 
+    // public static Map<Individual, Double> getCrowdingDistances(List<Individual> individuals) {
+    //     Map<Individual, Double> distances = new HashMap<>();
+    //     Map<Individual, Double> edgeValues = new HashMap<>();
+    //     Map<Individual, Double> connectivityMeasures = new HashMap<>();
+    //     Map<Individual, Double> overallDeviations = new HashMap<>();
     
-
-    public static void main(String[] args) {
+    //     for (Individual individual : individuals) {
+    //         distances.put(individual, 0.0);
+    //         edgeValues.put(individual, edgeValue(individual));
+    //         connectivityMeasures.put(individual, connectivityMeasure(individual));
+    //         overallDeviations.put(individual, overallDeviation(individual));
+    //     }
+    
+    //     // Compute crowding distances for each objective function
+    //     computeCrowdingDistances(individuals, distances, edgeValues, true);
+    //     computeCrowdingDistances(individuals, distances, connectivityMeasures, false);
+    //     computeCrowdingDistances(individuals, distances, overallDeviations, false);
+    
+    //     return distances;
+    // }
+    
+    // private static void computeCrowdingDistances(List<Individual> individuals, Map<Individual, Double> distances, Map<Individual, Double> objectiveValues, boolean isMinimization) {
+    //     individuals.sort(Comparator.comparing(objectiveValues::get));
+    
+    //     int l = individuals.size();
+    //     distances.replace(individuals.get(0), Double.POSITIVE_INFINITY);
+    //     distances.replace(individuals.get(l - 1), Double.POSITIVE_INFINITY);
+    
+    //     double minValue = objectiveValues.get(individuals.get(0));
+    //     double maxValue = objectiveValues.get(individuals.get(l - 1));
+    
+    //     for (int i = 1; i < l - 1; i++) {
+    //         double distanceValue = distances.get(individuals.get(i));
+    //         double valueOfNext = objectiveValues.get(individuals.get(i + 1));
+    //         double valueOfPrev = objectiveValues.get(individuals.get(i - 1));
+    //         double normalizedDifference = isMinimization ? (valueOfNext - valueOfPrev) / (maxValue - minValue) : (valueOfPrev - valueOfNext) / (maxValue - minValue);
+    //         distances.replace(individuals.get(i), distanceValue + normalizedDifference);
+    //     }
+    // }
+    
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
-        Individual individual = new Individual(image);
+        Individual individual = new Individual(image, 5);
         System.out.println(edgeValue(individual));
         System.out.println(connectivityMeasure(individual));
         System.out.println(overallDeviation(individual));
 
-        Population population = new Population(30, imagePath);
+        Population population = new Population(4, imagePath, 5, 10);
         List<List<Individual>> paretoRanks = getParetoFronts(population.getIndividuals());
         List<Individual> paretoFront = paretoRanks.get(0);
         List<Individual> secondParetoFront = paretoRanks.get(1);

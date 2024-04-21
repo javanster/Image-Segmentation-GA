@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 
 
 public class ParentSelector {
@@ -68,9 +69,9 @@ public class ParentSelector {
         return rankedTournament;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException, ExecutionException {
         String imagePath = "training_images/118035/Test image.jpg";
-        Population population = new Population(10, imagePath);
+        Population population = new Population(4, imagePath, 5, 10);
         Parameters.PARENT_COUNT = population.getIndividuals().size();
         Parameters.TOURNAMENT_SIZE = 4;
         Parameters.IS_TOURNAMENT_REPLACEMENT_ALLOWED = true;

@@ -51,5 +51,5 @@ public class TwoPointCrosser implements CrossoverHandler{
         children[1] = new Individual(child2, parent2);
 
         return children;
-    };
+    }
 }
