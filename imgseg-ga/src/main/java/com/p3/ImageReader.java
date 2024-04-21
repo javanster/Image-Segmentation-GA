@@ -111,43 +111,6 @@ public class ImageReader {
         }
     }
 
-    // public static void writeImageWithSegments(List<List<Integer>> pixels, int width, int height, String outputPath, Individual individual) {
-    //     // Create a new image
-    //     BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    //     WritableRaster raster = image.getRaster();
-
-    //     // Set the pixels
-    //     for (int i = 0; i < pixels.size(); i++) {
-    //         List<Integer> pixel = pixels.get(i);
-    //         raster.setPixel(i % width, i / width, new int[]{pixel.get(0), pixel.get(1), pixel.get(2)});
-    //     }
-
-    //     // Draw the segment borders
-    //     Graphics2D graphics = image.createGraphics();
-    //     graphics.setColor(Color.GREEN); // Light green color
-
-    //     for (Set<Integer> segment : individual.getSegments()) {
-    //         for (Integer pixelIndex : segment) {
-    //             int x = pixelIndex % width;
-    //             int y = pixelIndex / width;
-
-    //             // Draw a border pixel if it's on the edge of the segment
-    //             if (isBorderPixel(x, y, width, height, segment)) {
-    //                 graphics.drawRect(x, y, 1, 1);
-    //             }
-    //         }
-    //     }
-
-    //     graphics.dispose();
-
-    //     // Write the image to the output path
-    //     try {
-    //         ImageIO.write(image, "png", new File(outputPath));
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
     private static boolean isBorderPixel(int x, int y, int width, int height, Set<Integer> segment) {
         int[] dx = {-1, 0, 1, 0};
         int[] dy = {0, 1, 0, -1};
@@ -163,55 +126,6 @@ public class ImageReader {
 
         return false;
     }
-
-    // public static void writeImageWithSegments(List<List<Integer>> pixels, int width, int height, String outputPath, Individual individual) {
-    //     List<Set<Integer>> segments = individual.getSegments();
-
-    //     BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-    //     Graphics2D g = image.createGraphics();
-
-    //     // Draw all pixels
-    //     for (int i = 0; i < pixels.size(); i++) {
-    //         List<Integer> pixel = pixels.get(i);
-    //         int x = i % width;
-    //         int y = i / width;
-    //         Color color = new Color(pixel.get(0), pixel.get(1), pixel.get(2));
-    //         g.setColor(color);
-    //         g.fillRect(x, y, 1, 1);
-    //     }
-
-    //     // Draw segment borders
-    //     g.setColor(new Color(144, 238, 144)); // Light green color
-    //     for (Set<Integer> segment : segments) {
-    //         for (int i : segment) {
-    //             int x = i % width;
-    //             int y = i / width;
-
-    //             // Check neighboring pixels
-    //             for (int dx = -1; dx <= 1; dx++) {
-    //                 for (int dy = -1; dy <= 1; dy++) {
-    //                     int nx = x + dx;
-    //                     int ny = y + dy;
-    //                     int ni = ny * width + nx;
-
-    //                     // If neighboring pixel is not in the same segment, draw a border pixel
-    //                     if (nx >= 0 && nx < width && ny >= 0 && ny < height && !segment.contains(ni)) {
-    //                         g.fillRect(x, y, 1, 1);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //     }
-
-    //     g.dispose();
-
-    //     // Save the image
-    //     try {
-    //         ImageIO.write(image, "png", new File(outputPath));
-    //     } catch (Exception e) {
-    //         e.printStackTrace();
-    //     }
-    // }
 
     public static void writeImageWithSegments(List<List<Integer>> pixels, int width, int height, String outputPath, Individual individual) {
         List<Set<Integer>> segments = individual.getSegments();

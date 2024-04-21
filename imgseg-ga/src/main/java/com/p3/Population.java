@@ -24,6 +24,8 @@ public class Population {
     //     this.individuals = individuals;
     // }
 
+    // a variation of the constructor that takes in a lower and upper bound for the number of segments
+    // also uses a thread pool to create individuals in parallel
     public Population(int populationSize, String imageFilePath, int lowerBound, int upperBound) throws InterruptedException, ExecutionException {
         ExecutorService executor = Executors.newFixedThreadPool(3);
         List<Future<Individual>> futures = new ArrayList<>();

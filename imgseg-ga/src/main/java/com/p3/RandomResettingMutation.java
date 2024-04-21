@@ -16,26 +16,18 @@ public class RandomResettingMutation implements MutationHandler {
      */
     @Override
     public void mutate(Individual child) {
-        System.out.print("Starting mutation - ");
         int length = child.getChromosome().size();
         List<Integer> chromosome = child.getChromosome();
         Random random = new Random();
 
         for (int i = 0; i < length; i++) {
-            if (random.nextInt(1) < 0.005) { // 10/length) {
+            if (random.nextInt(1) < 0.005) { // 50/length) {
                 // set to a random int in interval [0, 8]
                 chromosome.set(i, random.nextInt(9));
-                // System.out.println("Mutated");
             }
         }
-        // if (newChromosome.equals(chromosome)) {
-        //     System.out.println("No mutation");
-        // }
-        // System.out.println("Mutation halfway - starting update");
 
         child.updateSegments();
-        // child.updateSegments();
-        System.out.println("Mutation done");
     }
 }
 
