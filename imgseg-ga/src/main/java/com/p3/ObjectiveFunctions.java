@@ -292,7 +292,7 @@ public class ObjectiveFunctions {
         return distances;
     }
     
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
         Individual individual = new Individual(image, 5);

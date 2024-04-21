@@ -28,7 +28,7 @@ public class NSGAII {
     private int lowerBound = 14;
     private int upperBound = 25;
 
-    public void run() throws InterruptedException, ExecutionException {
+    public void run() {
         System.out.println("Running NSGA-II");
         Population population = new Population(populationSize, imagePath, lowerBound, upperBound);
         System.out.println("Population generated");
@@ -142,7 +142,7 @@ public class NSGAII {
         }
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) {
         NSGAII nsgaII = new NSGAII();
         nsgaII.run();
     }

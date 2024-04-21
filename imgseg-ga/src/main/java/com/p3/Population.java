@@ -2,7 +2,6 @@ package com.p3;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.*;
 
 /**
  * Represents a population of individuals.
@@ -21,32 +20,21 @@ public class Population {
      * @param imageFilePath the file path of the image
      * @param lowerBound the lower bound for the number of segments
      * @param upperBound the upper bound for the number of segments
-     * @throws InterruptedException if the execution is interrupted
-     * @throws ExecutionException if an error occurs during execution
      */
-    public Population(int populationSize, String imageFilePath, int lowerBound, int upperBound) throws InterruptedException, ExecutionException {
-        ExecutorService executor = Executors.newFixedThreadPool(3);
-        List<Future<Individual>> futures = new ArrayList<>();
+    public Population(int populationSize, String imageFilePath, int lowerBound, int upperBound) {
         Image image = new Image(imageFilePath);
+        List<Individual> individuals = new ArrayList<>();
 
         for (int i = 0; i < populationSize; i++) {
-            final int index = i;
-            futures.add(executor.submit(() -> {
-                // pick a random number of segments between lowerBound and upperBound
-                int numSegments = lowerBound + (int) (Math.random() * (upperBound - lowerBound));
-                System.out.println("Creating individual " + (index + 1) + " of " + populationSize + ", with " + numSegments + " segments");
-                return new Individual(image, numSegments);
-            }));
+            // pick a random number of segments between lowerBound and upperBound
+            int numSegments = lowerBound + (int) (Math.random() * (upperBound - lowerBound));
+            System.out.println("Creating individual " + (i + 1) + " of " + populationSize + ", with " + numSegments + " segments");
+            individuals.add(new Individual(image, numSegments));
         }
 
-        List<Individual> individuals = new ArrayList<>();
-        for (Future<Individual> future : futures) {
-            individuals.add(future.get());
-        }
-
-        executor.shutdown();
         this.individuals = individuals;
     }
+
 
     public Population(List<Individual> individuals) {
         this.individuals = individuals;
@@ -61,7 +49,7 @@ public class Population {
         return new ArrayList<>(this.individuals);
     }
 
-    public static void main(String[] args) throws InterruptedException, ExecutionException {
+    public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         Population population = new Population(2, imagePath, 5, 10);
         System.out.println(population.getIndividuals().size());
