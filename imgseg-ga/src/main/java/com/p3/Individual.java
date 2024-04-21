@@ -48,10 +48,8 @@ public class Individual {
         this.connectivityMeasure = null;
         this.overallDeviation = null;
 
-        System.out.println("Calculating edge weights");
         // Map<Set<Integer>, Double> edgeWeights = this.getEdgeWeights(image);
         // this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength);
-        System.out.println("Creating chromosome");
         // this.chromosome = this.getChromosomeFromMST(edgeWeights, imageHeight, imageLength, n_trees);
 
         List<List<Edge>> adjacencyList = this.getAdjacencyList(image);
@@ -64,7 +62,6 @@ public class Individual {
         // }
         // this.chromosome = chromosome;
 
-        System.out.println("Setting segments");
         this.setSegments();
         this.setSegmentMap();
     }
@@ -79,16 +76,7 @@ public class Individual {
         // this.setSegmentMap();
     }
 
-    public void updateSegments() {
-        this.setSegments();
-        this.setSegmentMap();
-    }
-
-    /**
-     * Returns the chromosome of the individual.
-     * 
-     * @return The chromosome of the individual.
-     */
+    
     public List<Integer> getChromosome() {
         return this.chromosome;
     }
@@ -99,38 +87,18 @@ public class Individual {
         this.setSegmentMap();
     }
 
-    /**
-     * Returns the segments of the individual.
-     * 
-     * @return The segments of the individual.
-     */
     public List<Set<Integer>> getSegments() {
         return this.segments;
     }
 
-    /**
-     * Returns the segment map of the individual.
-     * 
-     * @return The segment map of the individual.
-     */
     public Map<Integer, Integer> getSegmentMap() {
         return this.segmentMap;
     }
 
-    /**
-     * Returns the image of the individual.
-     * 
-     * @return The image of the individual.
-     */
     public Image getImage() {
         return this.image;
     }
 
-    /**
-     * Returns the edge value of the individual.
-     * 
-     * @return The edge value of the individual.
-     */
     public double getEdgeValue() {
         if (this.edgeValue == null) {
             this.edgeValue = ObjectiveFunctions.edgeValue(this);
@@ -138,11 +106,6 @@ public class Individual {
         return this.edgeValue;
     }
 
-    /**
-     * Returns the connectivity measure of the individual. 
-     * 
-     * @return The connectivity measure of the individual.
-     */
     public double getConnectivityMeasure() {
         if (this.connectivityMeasure == null) {
             this.connectivityMeasure = ObjectiveFunctions.connectivityMeasure(this);
@@ -150,11 +113,6 @@ public class Individual {
         return this.connectivityMeasure;
     }
 
-    /**
-     * Returns the overall deviation of the individual.
-     * 
-     * @return The overall deviation of the individual.
-     */
     public double getOverallDeviation() {
         if (this.overallDeviation == null) {
             this.overallDeviation = ObjectiveFunctions.overallDeviation(this);
@@ -162,6 +120,10 @@ public class Individual {
         return this.overallDeviation;
     }
 
+    /**
+     * Resets the objective values of the individual, so that they are recalculated 
+     * the next time they are accessed.
+     */
     public void resetObjectiveValues() {
         this.edgeValue = null;
         this.connectivityMeasure = null;
@@ -169,6 +131,17 @@ public class Individual {
     }
 
     /**
+     * Sets the segments of the individual based on the chromosome. The segments are created by traversing
+     * the graphs of the individual. One graph corresponds to one segment.
+     */
+    public void updateSegments() {
+        this.setSegments();
+        this.setSegmentMap();
+    }
+
+    /**
+     * May not be needed anymore
+     * 
      * Returns a map of the edges between the pixels in the image and their weights.
      * The weight of the edge between two pixels is the Euclidean distance between the RGB values of the pixels.
      * 
@@ -198,160 +171,108 @@ public class Individual {
         return edgeWeights;
     }
 
-    // /**
-    //  * Creates a chromosome from a minimum spanning tree (MST) of the image. The MST is created using
-    //  * Prim's algorithm, where the weight of the edge between two pixels is the Euclidean distance between
-    //  * the RGB values of the pixels.
-    //  * 
-    //  * @param edgeWeights A map where the keys are sets of two pixel indexes and the values are the weights of the edges between the pixels.
-    //  * @param imageHeight The height of the image in pixels.
-    //  * @param imageLength The length of the image in pixels.
-    //  * @return The chromosome of the individual.
-    //  */
-    // private List<Integer> getChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength) {
-    //     int pixelCount = imageHeight * imageLength;
-    //     List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
+    /**
+     * May not be needed anymore
+     * 
+     * Creates a chromosome from a minimum spanning tree (MST) of the image. The MST is created using
+     * Prim's algorithm, where the weight of the edge between two pixels is the Euclidean distance between
+     * the RGB values of the pixels.
+     * 
+     * @param edgeWeights A map where the keys are sets of two pixel indexes and the values are the weights of the edges between the pixels.
+     * @param imageHeight The height of the image in pixels.
+     * @param imageLength The length of the image in pixels.
+     * @return The chromosome of the individual.
+     */
+    private List<Integer> getChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength) {
+        int pixelCount = imageHeight * imageLength;
+        List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
         
-    //     Random random = new Random();
-    //     int randomPixelIndex = random.nextInt(pixelCount);
+        Random random = new Random();
+        int randomPixelIndex = random.nextInt(pixelCount);
 
-    //     List<Integer> visitedIndexes = new ArrayList<>();
-    //     visitedIndexes.add(randomPixelIndex);
+        List<Integer> visitedIndexes = new ArrayList<>();
+        visitedIndexes.add(randomPixelIndex);
 
-    //     while (visitedIndexes.size() < pixelCount) {
-    //         int originPixelIndex = visitedIndexes.get(0);
-    //         double minWeight = Double.MAX_VALUE;
-    //         int minPixelIndex = -1;
-    //         for (int pixelIndex : visitedIndexes) {
-    //             for (Set<Integer> key : edgeWeights.keySet()) {
-    //                 List<Integer> keyList = new ArrayList<>(key);
-    //                 if (key.contains(pixelIndex) && (!(visitedIndexes.contains(keyList.get(0)) && visitedIndexes.contains(keyList.get(1))))) {
-    //                     double weight = edgeWeights.get(key);
-    //                     if (weight < minWeight) {
-    //                         originPixelIndex = pixelIndex;
-    //                         minWeight = weight;
-    //                         minPixelIndex = keyList.get(0) != pixelIndex ? keyList.get(0) : keyList.get(1);
-    //                     }
-    //                 }
-    //             }
-    //         }
-    //         edgeWeights.remove(Set.of(originPixelIndex, minPixelIndex));
-    //         visitedIndexes.add(minPixelIndex);
-    //         if (chromosome.get(originPixelIndex) == 0) {
-    //             int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(originPixelIndex, graphDirection);
-    //         } else {
-    //             int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(minPixelIndex, graphDirection);
-    //         }
-    //     }
-    //     return chromosome;
-    // }
+        while (visitedIndexes.size() < pixelCount) {
+            int originPixelIndex = visitedIndexes.get(0);
+            double minWeight = Double.MAX_VALUE;
+            int minPixelIndex = -1;
+            for (int pixelIndex : visitedIndexes) {
+                for (Set<Integer> key : edgeWeights.keySet()) {
+                    List<Integer> keyList = new ArrayList<>(key);
+                    if (key.contains(pixelIndex) && (!(visitedIndexes.contains(keyList.get(0)) && visitedIndexes.contains(keyList.get(1))))) {
+                        double weight = edgeWeights.get(key);
+                        if (weight < minWeight) {
+                            originPixelIndex = pixelIndex;
+                            minWeight = weight;
+                            minPixelIndex = keyList.get(0) != pixelIndex ? keyList.get(0) : keyList.get(1);
+                        }
+                    }
+                }
+            }
+            edgeWeights.remove(Set.of(originPixelIndex, minPixelIndex));
+            visitedIndexes.add(minPixelIndex);
+            if (chromosome.get(originPixelIndex) == 0) {
+                int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
+                chromosome.set(originPixelIndex, graphDirection);
+            } else {
+                int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
+                chromosome.set(minPixelIndex, graphDirection);
+            }
+        }
+        return chromosome;
+    }
     
-    // faster implementation
-    // private List<Integer> getChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength) {
-    //     int pixelCount = imageHeight * imageLength;
-    //     List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
-    
-    //     Random random = new Random();
-    //     int randomPixelIndex = random.nextInt(pixelCount);
-    
-    //     Set<Integer> visitedIndexes = new HashSet<>();
-    //     visitedIndexes.add(randomPixelIndex);
-    
-    //     PriorityQueue<Edge> queue = new PriorityQueue<>((a, b) -> Double.compare(a.weight, b.weight));
-    //     queue.addAll(getEdgesFromNode(randomPixelIndex, edgeWeights));
-    
-    //     while (visitedIndexes.size() < pixelCount) {
-    //         // System.out.println(visitedIndexes.size() + "/" + pixelCount);
+    /**
+     * May not be needed anymore
+     * A faster implementation than the one above
+     * 
+     * Creates a chromosome from a minimum spanning tree (MST) of the image. The MST is created using
+     * Prim's algorithm, where the weight of the edge between two pixels is the Euclidean distance between
+     * the RGB values of the pixels.
+     * 
+     * @param edgeWeights A map where the keys are sets of two pixel indexes and the values are the weights of the edges between the pixels.
+     * @param imageHeight The height of the image in pixels.
+     * @param imageLength The length of the image in pixels.
+     * @return The chromosome of the individual.
+     */
+    private List<Integer> getFastChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength) {
+        int pixelCount = imageHeight * imageLength;
+        List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
 
-    //         Edge minEdge = queue.poll();
-    //         while (minEdge != null && visitedIndexes.contains(minEdge.to)) {
-    //             minEdge = queue.poll();
-    //         }
-    //         if (minEdge == null) {
-    //             break;
-    //         }
-    
-    //         int originPixelIndex = minEdge.from;
-    //         int minPixelIndex = minEdge.to;
-    //         visitedIndexes.add(minPixelIndex);
-    //         queue.addAll(getEdgesFromNode(minPixelIndex, edgeWeights));
-    
-    //         if (chromosome.get(originPixelIndex) == 0) {
-    //             int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(originPixelIndex, graphDirection);
-    //         } else {
-    //             int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(minPixelIndex, graphDirection);
-    //         }
-    //     }
-    //     return chromosome;
-    // }
-    
-    // private List<Edge> getEdgesFromNode(int node, Map<Set<Integer>, Double> edgeWeights) {
-    //     List<Edge> edges = new ArrayList<>();
-    //     for (Map.Entry<Set<Integer>, Double> entry : edgeWeights.entrySet()) {
-    //         if (entry.getKey().contains(node)) {
-    //             int otherNode = entry.getKey().stream().filter(n -> n != node).findFirst().get();
-    //             edges.add(new Edge(node, otherNode, entry.getValue()));
-    //         }
-    //     }
-    //     return edges;
-    // }
-    
-    // private static class Edge {
-    //     int from;
-    //     int to;
-    //     double weight;
-    
-    //     Edge(int from, int to, double weight) {
-    //         this.from = from;
-    //         this.to = to;
-    //         this.weight = weight;
-    //     }
-    // }
-    
-    // even faster implementation
-    // private List<Integer> getChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength) {
-    //     int pixelCount = imageHeight * imageLength;
-    //     List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
+        Random random = new Random();
+        int randomPixelIndex = random.nextInt(pixelCount);
 
-    //     Random random = new Random();
-    //     int randomPixelIndex = random.nextInt(pixelCount);
+        Set<Integer> visitedIndexes = new HashSet<>();
+        visitedIndexes.add(randomPixelIndex);
 
-    //     Set<Integer> visitedIndexes = new HashSet<>();
-    //     visitedIndexes.add(randomPixelIndex);
+        PriorityQueue<Edge> queue = new PriorityQueue<>();
+        addEdgesToQueue(queue, randomPixelIndex, edgeWeights, visitedIndexes);
 
-    //     PriorityQueue<Edge> queue = new PriorityQueue<>();
-    //     addEdgesToQueue(queue, randomPixelIndex, edgeWeights, visitedIndexes);
+        while (visitedIndexes.size() < pixelCount) {
+            Edge minEdge = queue.poll();
+            while (minEdge != null && visitedIndexes.contains(minEdge.to)) {
+                minEdge = queue.poll();
+            }
+            if (minEdge == null) {
+                break;
+            }
 
-    //     while (visitedIndexes.size() < pixelCount) {
-    //         // System.out.println(visitedIndexes.size() + "/" + pixelCount);
+            int originPixelIndex = minEdge.from;
+            int minPixelIndex = minEdge.to;
+            visitedIndexes.add(minPixelIndex);
+            addEdgesToQueue(queue, minPixelIndex, edgeWeights, visitedIndexes);
 
-    //         Edge minEdge = queue.poll();
-    //         while (minEdge != null && visitedIndexes.contains(minEdge.to)) {
-    //             minEdge = queue.poll();
-    //         }
-    //         if (minEdge == null) {
-    //             break;
-    //         }
-
-    //         int originPixelIndex = minEdge.from;
-    //         int minPixelIndex = minEdge.to;
-    //         visitedIndexes.add(minPixelIndex);
-    //         addEdgesToQueue(queue, minPixelIndex, edgeWeights, visitedIndexes);
-
-    //         if (chromosome.get(originPixelIndex) == 0) {
-    //             int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(originPixelIndex, graphDirection);
-    //         } else {
-    //             int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
-    //             chromosome.set(minPixelIndex, graphDirection);
-    //         }
-    //     }
-    //     return chromosome;
-    // }
+            if (chromosome.get(originPixelIndex) == 0) {
+                int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
+                chromosome.set(originPixelIndex, graphDirection);
+            } else {
+                int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
+                chromosome.set(minPixelIndex, graphDirection);
+            }
+        }
+        return chromosome;
+    }
 
     private void addEdgesToQueue(PriorityQueue<Edge> queue, int node, Map<Set<Integer>, Double> edgeWeights, Set<Integer> visited) {
         for (Map.Entry<Set<Integer>, Double> entry : edgeWeights.entrySet()) {
@@ -453,10 +374,8 @@ public class Individual {
         }
     }
 
-
-
-
     // this is good, but slow
+    // makes multiple trees, such as the one above
     // private List<Integer> getChromosomeFromMST(Map<Set<Integer>, Double> edgeWeights, int imageHeight, int imageLength, int n_trees) {
     //     int pixelCount = imageHeight * imageLength;
     //     List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
@@ -624,6 +543,27 @@ public class Individual {
     //             }
     //         }
     //     }
+
+    // A faster implementation than the one above
+    private void setSegments() {
+        int pixelCount = this.chromosome.size();
+        DisjointSet ds = new DisjointSet(pixelCount);
+
+        for (int i = 0; i < pixelCount; i++) {
+            int neighbor = getNeighborFromGraph(i, this.image.getImageHeight(), this.image.getImageLength(), chromosome.get(i));
+            if (neighbor != -1) {
+                ds.union(i, neighbor);
+            }
+        }
+
+        Map<Integer, Set<Integer>> segmentsMap = new HashMap<>();
+        for (int i = 0; i < pixelCount; i++) {
+            int root = ds.find(i);
+            segmentsMap.computeIfAbsent(root, k -> new HashSet<>()).add(i);
+        }
+
+        this.segments = new ArrayList<>(segmentsMap.values());
+    }
     
     //     // Create a list of unique segments from the map values
     //     List<Set<Integer>> segments = new ArrayList<>(new HashSet<>(pixelToSegment.values()));
@@ -645,6 +585,16 @@ public class Individual {
     //     }
     //     this.segmentMap = segmentMap;
     // }
+
+    // A faster implementation than the one above
+    private void setSegmentMap() {
+        this.segmentMap = new HashMap<>();
+        for (int i = 0; i < this.segments.size(); i++) {
+            for (int pixel : this.segments.get(i)) {
+                this.segmentMap.put(pixel, i);
+            }
+        }
+    }
 
     /**
      * Returns the index of the neighboring pixel of the pixel at index pixelIndex in the image based on the direction.
@@ -743,35 +693,6 @@ public class Individual {
             } else {
                 parent[yRoot] = xRoot;
                 rank[xRoot]++;
-            }
-        }
-    }
-
-    private void setSegments() {
-        int pixelCount = this.chromosome.size();
-        DisjointSet ds = new DisjointSet(pixelCount);
-
-        for (int i = 0; i < pixelCount; i++) {
-            int neighbor = getNeighborFromGraph(i, this.image.getImageHeight(), this.image.getImageLength(), chromosome.get(i));
-            if (neighbor != -1) {
-                ds.union(i, neighbor);
-            }
-        }
-
-        Map<Integer, Set<Integer>> segmentsMap = new HashMap<>();
-        for (int i = 0; i < pixelCount; i++) {
-            int root = ds.find(i);
-            segmentsMap.computeIfAbsent(root, k -> new HashSet<>()).add(i);
-        }
-
-        this.segments = new ArrayList<>(segmentsMap.values());
-    }
-
-    private void setSegmentMap() {
-        this.segmentMap = new HashMap<>();
-        for (int i = 0; i < this.segments.size(); i++) {
-            for (int pixel : this.segments.get(i)) {
-                this.segmentMap.put(pixel, i);
             }
         }
     }
