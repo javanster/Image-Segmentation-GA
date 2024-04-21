@@ -37,7 +37,7 @@ public class Individual {
     private Double overallDeviation;
 
 
-    public Individual(Image image, int n_trees) {
+    public Individual(Image image, int numTrees) {
         this.image = image;
         int imageHeight = image.getImageHeight();
         int imageLength = image.getImageLength();
@@ -47,7 +47,7 @@ public class Individual {
         this.overallDeviation = null;
 
         List<List<Edge>> adjacencyList = this.getAdjacencyList(image);
-        this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageLength, n_trees);
+        this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageLength, numTrees);
 
         // List<Integer> chromosome = new ArrayList<>();
         // Random random = new Random();
@@ -208,7 +208,7 @@ public class Individual {
      * @param imageLength The length of the image in pixels.
      * @return The chromosome of the individual.
      */
-    private List<Integer> getChromosomeFromMST(List<List<Edge>> adjacencyList, int imageHeight, int imageLength, int n_trees) {
+    private List<Integer> getChromosomeFromMST(List<List<Edge>> adjacencyList, int imageHeight, int imageLength, int numTrees) {
         int pixelCount = imageHeight * imageLength;
         List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
 
@@ -216,7 +216,7 @@ public class Individual {
         Set<Integer> visitedIndexes = new HashSet<>();
         PriorityQueue<Edge> queue = new PriorityQueue<>();
 
-        for (int i = 0; i < n_trees; i++) {
+        for (int i = 0; i < numTrees; i++) {
             int randomPixelIndex = random.nextInt(pixelCount);
             visitedIndexes.add(randomPixelIndex);
             addEdgesToQueue(queue, randomPixelIndex, adjacencyList, visitedIndexes);
