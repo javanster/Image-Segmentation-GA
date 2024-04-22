@@ -1,10 +1,10 @@
 package com.p3;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 /**
  * The ObjectiveFunctions class provides static methods for calculating objective function values
@@ -290,6 +290,34 @@ public class ObjectiveFunctions {
         }
 
         return distances;
+    }
+
+    /**
+     * Rank the individuals in a list based on Pareto front and crowding distance.
+     * 
+     * Based on:
+     * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
+     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), 185. https://doi.org/10.1109/4235.996017 
+     * 
+     * @param individuals The individuals to rank.
+     * @return A list of individuals ranked by Pareto front and crowding distance.
+     */
+    public static List<Individual> nonDominatedSort(List<Individual> individuals) {
+        System.out.println("Getting paretoFronts ...");
+        List<List<Individual>> paretoFronts = ObjectiveFunctions.getParetoFronts(individuals);
+        System.out.println("Getting crowdingDistances ...");
+        Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(individuals);
+
+        for (List<Individual> front : paretoFronts) {
+            front.sort(Comparator.comparingDouble(crowdingDistances::get).reversed());
+        }
+
+        List<Individual> rankedIndividuals = new ArrayList<>();
+        for (List<Individual> front : paretoFronts) {
+            rankedIndividuals.addAll(front);
+        }
+        System.out.println("Ranking individuals done");
+        return rankedIndividuals;
     }
     
     public static void main(String[] args) {
