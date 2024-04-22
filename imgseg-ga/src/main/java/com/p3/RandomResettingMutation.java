@@ -15,8 +15,8 @@ public class RandomResettingMutation implements MutationHandler {
      */
     @Override
     public void mutate(Individual child) {
-        int length = child.getChromosome().size();
         List<Integer> chromosome = child.getChromosome();
+        int length = chromosome.size();
         Random random = new Random();
 
         for (int i = 0; i < length; i++) {
@@ -26,7 +26,7 @@ public class RandomResettingMutation implements MutationHandler {
             }
         }
 
-        child.updateSegments();
+        child.setChromosome(chromosome);
     }
 }
 

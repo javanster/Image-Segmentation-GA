@@ -63,16 +63,13 @@ public class Individual {
     public Individual(List<Integer> chromosome, Individual parent) {
         this.chromosome = chromosome;
         this.image = parent.getImage();
-        // this.segments = parent.getSegments();
-        // this.segmentMap = parent.getSegmentMap();
-
-        // this.setSegments();
-        // this.setSegmentMap();
+        this.setSegments();
+        this.setSegmentMap();
     }
 
     
     public List<Integer> getChromosome() {
-        return this.chromosome;
+        return new ArrayList<>(this.chromosome);
     }
 
     public void setChromosome(List<Integer> chromosome) {
@@ -122,15 +119,6 @@ public class Individual {
         this.edgeValue = null;
         this.connectivityMeasure = null;
         this.overallDeviation = null;
-    }
-
-    /**
-     * Sets the segments of the individual based on the chromosome. The segments are created by traversing
-     * the graphs of the individual. One graph corresponds to one segment.
-     */
-    public void updateSegments() {
-        this.setSegments();
-        this.setSegmentMap();
     }
 
     /**
