@@ -113,8 +113,11 @@ public class ImageReader {
      * @param outputPath  The path where the image will be saved.
      * @param individual  The individual containing the segments.
      */
-    public static void writeImageWithSegments(List<List<Integer>> pixels, int width, int height, String outputPath, Individual individual) {
+    public static void writeImageWithSegments(String outputPath, Individual individual) {
         List<Set<Integer>> segments = individual.getSegments();
+        int width = Parameters.IMAGE.getImageLength();
+        int height = Parameters.IMAGE.getImageHeight();
+        List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();

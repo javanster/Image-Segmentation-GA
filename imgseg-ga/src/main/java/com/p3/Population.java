@@ -21,15 +21,14 @@ public class Population {
      * @param lowerBound the lower bound for the number of segments
      * @param upperBound the upper bound for the number of segments
      */
-    public Population(int populationSize, String imageFilePath, int lowerBound, int upperBound) {
-        Image image = new Image(imageFilePath);
+    public Population() {
         List<Individual> individuals = new ArrayList<>();
 
-        for (int i = 0; i < populationSize; i++) {
+        for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
             // pick a random number of segments between lowerBound and upperBound
-            int numSegments = lowerBound + (int) (Math.random() * (upperBound - lowerBound));
-            System.out.println("Creating individual " + (i + 1) + " of " + populationSize + ", with " + numSegments + " segments");
-            individuals.add(new Individual(image, numSegments));
+            int numSegments = Parameters.SEGMENTS_LOWEBOUND + (int) (Math.random() * (Parameters.SEGMENTS_UPPERBOUND - Parameters.SEGMENTS_LOWEBOUND));
+            System.out.println("Creating individual " + (i + 1) + " of " + Parameters.POPULATION_SIZE + ", with " + numSegments + " segments");
+            individuals.add(new Individual(numSegments));
         }
 
         this.individuals = individuals;
@@ -49,9 +48,17 @@ public class Population {
         return new ArrayList<>(this.individuals);
     }
 
+    public List<Individual> getBestIndividuals() {
+        return ObjectiveFunctions.getParetoFronts(this.individuals).get(0);
+    }
+
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
-        Population population = new Population(2, imagePath, 5, 10);
+        Parameters.POPULATION_SIZE = 2;
+        Parameters.IMAGE = new Image(imagePath);
+        Parameters.SEGMENTS_LOWEBOUND = 5;
+        Parameters.SEGMENTS_UPPERBOUND = 10;
+        Population population = new Population();
         System.out.println(population.getIndividuals().size());
     }
 }

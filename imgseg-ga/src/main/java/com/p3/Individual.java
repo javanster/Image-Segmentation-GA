@@ -30,23 +30,21 @@ public class Individual {
     private List<Integer> chromosome;
     private List<Set<Integer>> segments;
     private Map<Integer, Integer> segmentMap;
-    private Image image;
 
     private Double edgeValue;
     private Double connectivityMeasure;
     private Double overallDeviation;
 
 
-    public Individual(Image image, int numTrees) {
-        this.image = image;
-        int imageHeight = image.getImageHeight();
-        int imageLength = image.getImageLength();
+    public Individual(int numTrees) {
+        int imageHeight = Parameters.IMAGE.getImageHeight();
+        int imageLength = Parameters.IMAGE.getImageLength();
 
         this.edgeValue = null;
         this.connectivityMeasure = null;
         this.overallDeviation = null;
 
-        List<List<Edge>> adjacencyList = this.getAdjacencyList(image);
+        List<List<Edge>> adjacencyList = this.getAdjacencyList(Parameters.IMAGE);
         this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageLength, numTrees);
 
         // List<Integer> chromosome = new ArrayList<>();
@@ -62,7 +60,6 @@ public class Individual {
 
     public Individual(List<Integer> chromosome, Individual parent) {
         this.chromosome = chromosome;
-        this.image = parent.getImage();
         this.setSegments();
         this.setSegmentMap();
     }
@@ -84,10 +81,6 @@ public class Individual {
 
     public Map<Integer, Integer> getSegmentMap() {
         return this.segmentMap;
-    }
-
-    public Image getImage() {
-        return this.image;
     }
 
     public double getEdgeValue() {
@@ -342,7 +335,7 @@ public class Individual {
         DisjointSet ds = new DisjointSet(pixelCount);
 
         for (int i = 0; i < pixelCount; i++) {
-            int neighbor = getNeighborFromGraph(i, this.image.getImageHeight(), this.image.getImageLength(), chromosome.get(i));
+            int neighbor = getNeighborFromGraph(i, Parameters.IMAGE.getImageHeight(), Parameters.IMAGE.getImageLength(), chromosome.get(i));
             if (neighbor != -1) {
                 ds.union(i, neighbor);
             }
@@ -474,7 +467,8 @@ public class Individual {
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
         Image image = new Image(imagePath);
-        Individual individual = new Individual(image, 5);
+        Parameters.IMAGE = image;
+        Individual individual = new Individual(5);
         System.out.println(individual.getSegmentMap());
     }
 }

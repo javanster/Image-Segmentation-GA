@@ -1,6 +1,5 @@
 package com.p3;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,9 +27,9 @@ public class ObjectiveFunctions {
      */
     public static double edgeValue(Individual individual) {
         double edgeValue = 0.0;
-        List<List<Integer>> pixels = individual.getImage().getPixels();
-        int imageHeight = individual.getImage().getImageHeight();
-        int imageLength = individual.getImage().getImageLength();
+        List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
+        int imageHeight = Parameters.IMAGE.getImageHeight();
+        int imageLength = Parameters.IMAGE.getImageLength();
         Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
@@ -57,9 +56,9 @@ public class ObjectiveFunctions {
      */
     public static double connectivityMeasure(Individual individual) {
         double connectivityMeasure = 0.0;
-        List<List<Integer>> pixels = individual.getImage().getPixels();
-        int imageHeight = individual.getImage().getImageHeight();
-        int imageLength = individual.getImage().getImageLength();
+        List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
+        int imageHeight = Parameters.IMAGE.getImageHeight();
+        int imageLength = Parameters.IMAGE.getImageLength();
         Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
@@ -84,11 +83,12 @@ public class ObjectiveFunctions {
      */
     public static double overallDeviation(Individual individual) {
         double segmentDeviation = 0.0;
-        List<List<Integer>> pixels = individual.getImage().getPixels();
+        List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
         for (Set<Integer> segment : individual.getSegments()) {
+            List<Integer> centroid = getCentroid(individual, segment);
             for (Integer i : segment) {
-                segmentDeviation += euclideanDistance(pixels.get(i), getCentroid(individual, segment));
+                segmentDeviation += euclideanDistance(pixels.get(i), centroid);
             }
         }
         return segmentDeviation;
@@ -107,7 +107,7 @@ public class ObjectiveFunctions {
         int redSum = 0;
         int greenSum = 0;
         int blueSum = 0;
-        List<List<Integer>> pixels = individual.getImage().getPixels();
+        List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
         for (Integer i : segment) {
             List<Integer> pixel = pixels.get(i);
@@ -192,6 +192,20 @@ public class ObjectiveFunctions {
         }
     
         return paretoFronts;
+    }
+
+    public static Map<Individual, Integer> getParetoFrontsMap(List<Individual> individuals) {
+        Map<Individual, Integer> paretoFrontsMap = new HashMap<>();
+        List<List<Individual>> paretoFronts = getParetoFronts(individuals);
+
+        for (int i = 0; i < paretoFronts.size(); i++) {
+            List<Individual> paretoFront = paretoFronts.get(i);
+            for (Individual individual : paretoFront) {
+                paretoFrontsMap.put(individual, i);
+            }
+        }
+
+        return paretoFrontsMap;
     }
 
     /**
@@ -301,7 +315,7 @@ public class ObjectiveFunctions {
      * 
      * @param individuals The individuals to rank.
      * @return A list of individuals ranked by Pareto front and crowding distance.
-     */
+     
     public static List<Individual> nonDominatedSort(List<Individual> individuals) {
         System.out.println("Getting paretoFronts ...");
         List<List<Individual>> paretoFronts = ObjectiveFunctions.getParetoFronts(individuals);
@@ -318,18 +332,28 @@ public class ObjectiveFunctions {
         }
         System.out.println("Ranking individuals done");
         return rankedIndividuals;
-    }
+    } */
     
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
-        Image image = new Image(imagePath);
-        Individual individual = new Individual(image, 5);
+        Parameters.IMAGE = new Image(imagePath);
+        Parameters.POPULATION_SIZE = 20;
+        Parameters.SEGMENTS_LOWEBOUND = 5;
+        Parameters.SEGMENTS_UPPERBOUND = 10;
+        Individual individual = new Individual(5);
         System.out.println(edgeValue(individual));
         System.out.println(connectivityMeasure(individual));
         System.out.println(overallDeviation(individual));
+        Population population = new Population();
 
-        Population population = new Population(4, imagePath, 5, 10);
+
+        long startTime = System.nanoTime();
         List<List<Individual>> paretoRanks = getParetoFronts(population.getIndividuals());
+        long endTime = System.nanoTime();
+        long durationNano = endTime - startTime;
+        double durationSeconds = durationNano / 1e9; // Convert nanoseconds to seconds
+        System.out.println("Execution time of getParetoFronts: " + durationSeconds + " seconds");
+
         List<Individual> paretoFront = paretoRanks.get(0);
         List<Individual> secondParetoFront = paretoRanks.get(1);
         List<Individual> thirdParetoFront = paretoRanks.get(2);

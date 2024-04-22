@@ -4,7 +4,6 @@ import java.util.List;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
 
 public class NSGAII {
@@ -20,17 +19,14 @@ public class NSGAII {
 
     private int populationSize = 6;
     private int lambda = populationSize * 3;
-    private String imagePath = "training_images/118035/Test image.jpg";
     private OnePointCrosser crossover = new OnePointCrosser();
     // private TwoPointCrosser crossover = new TwoPointCrosser();
     private RandomResettingMutation mutation = new RandomResettingMutation();
 
-    private int lowerBound = 14;
-    private int upperBound = 25;
 
     public void run() {
         System.out.println("Running NSGA-II");
-        Population population = new Population(populationSize, imagePath, lowerBound, upperBound);
+        Population population = new Population();
         System.out.println("Population generated");
         System.out.println();
 
@@ -42,7 +38,7 @@ public class NSGAII {
         System.out.println();
 
         for (int k = 0; k < populationSize; k++) {
-            ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter-" + k + ".png", population.getIndividuals().get(k));
+            ImageReader.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k));
         }
         // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter.png", bestIndividual);
 
@@ -136,13 +132,18 @@ public class NSGAII {
             System.out.println();
             
             for (int k = 0; k < populationSize; k++) {
-                ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k));
+                ImageReader.writeImageWithSegments("createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k));
             }
             // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + ".png", bestIndividual);
         }
     }
 
     public static void main(String[] args) {
+        String imagePath = "training_images/118035/Test image.jpg";
+        Parameters.POPULATION_SIZE = 20;
+        Parameters.IMAGE = new Image(imagePath);
+        Parameters.SEGMENTS_LOWEBOUND = 14;
+        Parameters.SEGMENTS_UPPERBOUND = 25;
         NSGAII nsgaII = new NSGAII();
         nsgaII.run();
     }
