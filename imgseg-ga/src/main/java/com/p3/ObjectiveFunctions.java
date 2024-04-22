@@ -235,7 +235,7 @@ public class ObjectiveFunctions {
      * 
      * Based on:
      * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
-     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), 185. https://doi.org/10.1109/4235.996017 
+     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), p. 185. https://doi.org/10.1109/4235.996017 
      * 
      * @param population The population of individuals.
      * @return Map where the keys are individuals and the values are their crowding distances.
@@ -297,7 +297,7 @@ public class ObjectiveFunctions {
      * 
      * Based on:
      * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
-     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), 185. https://doi.org/10.1109/4235.996017 
+     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), p. 185. https://doi.org/10.1109/4235.996017 
      * 
      * @param individuals The individuals to rank.
      * @return A list of individuals ranked by Pareto front and crowding distance.
