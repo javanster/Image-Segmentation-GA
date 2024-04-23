@@ -1,24 +1,31 @@
 package com.p3;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * A class that generates offspring from two parents by performing crossover and mutation.
  */
 public class OffspringGenerator {
     
-    /**
-     * Generates offspring from two parents by performing crossover and mutation. Crossover and mutation
-     * is done according to the parameters set in the Parameters class.
-     * 
-     * @param parent1 The first parent.
-     * @param parent2 The second parent.
-     * @return An array of two individuals, which are the offspring of the two parents.
-     */
-    public static Individual[] generateOffspring(Individual parent1, Individual parent2) {
+    public static Population generateOffspring(Population parents) {
 
-        Individual[] offspring = Parameters.CROSSOVER_HANDLER.cross(parent1, parent2);
-        Parameters.MUTATION_HANDLER.mutate(offspring[0]);
-        Parameters.MUTATION_HANDLER.mutate(offspring[1]);
+        // Might remove shuffling later
+        List<Individual> parentIndividuals = parents.getIndividuals();
+        Collections.shuffle(parentIndividuals);
 
-        return offspring;
+        List<Individual> offspringList = new ArrayList<>();
+        for (int j = 0; j < parentIndividuals.size(); j += 2) {
+            Individual parent1 = parentIndividuals.get(j);
+            Individual parent2 = parentIndividuals.get(j + 1);
+            Individual[] offspring = Parameters.CROSSOVER_HANDLER.cross(parent1, parent2);
+            Parameters.MUTATION_HANDLER.mutate(offspring[0]);
+            Parameters.MUTATION_HANDLER.mutate(offspring[1]);
+            offspringList.add(offspring[0]);
+            offspringList.add(offspring[1]);
+        }
+
+        return new Population(offspringList);
     }
 }
