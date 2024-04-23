@@ -20,7 +20,7 @@ public class RandomResettingMutation implements MutationHandler {
         Random random = new Random();
 
         for (int i = 0; i < length; i++) {
-            if (random.nextInt(1) < 0.005) { // 50/length) {
+            if (random.nextInt(1) < Parameters.MUTATION_PROBABILITY) { // 50/length) {
                 // set to a random int in interval [0, 8]
                 chromosome.set(i, random.nextInt(9));
             }
