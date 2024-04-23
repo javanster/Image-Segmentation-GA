@@ -5,21 +5,15 @@ import java.util.List;
 
 /**
  * Represents a population of individuals.
- *
- * @param populationSize The size of the population.
- * @param imageFilePath The path to the image file.
  */
 public class Population {
     
     private List<Individual> individuals;
 
     /**
-     * Constructs a Population object with the specified parameters.
-     *
-     * @param populationSize the size of the population
-     * @param imageFilePath the file path of the image
-     * @param lowerBound the lower bound for the number of segments
-     * @param upperBound the upper bound for the number of segments
+     * Creates a population of individuals. The number of individuals in the population is determined by the
+     * Parameters.POPULATION_SIZE parameter. Each individual is created with a random number of segments
+     * between Parameters.SEGMENTS_LOWEBOUND and Parameters.SEGMENTS_UPPERBOUND.
      */
     public Population() {
         List<Individual> individuals = new ArrayList<>();
@@ -35,10 +29,21 @@ public class Population {
     }
 
 
+    /**
+     * Creates a population of individuals from a list of individuals.
+     * 
+     * @param individuals A list of individuals.
+     */
     public Population(List<Individual> individuals) {
         this.individuals = individuals;
     }
 
+    /**
+     * Creates a population of individuals from two populations.
+     * 
+     * @param population1 The first population.
+     * @param population2 The second population.
+     */
     public Population(Population population1, Population population2) {
         List<Individual> individualsFromBoth = population1.getIndividuals();
         individualsFromBoth.addAll(population2.getIndividuals());
@@ -46,9 +51,9 @@ public class Population {
     }
 
     /**
-     * Returns a list of individuals in the population.
+     * Returns a list of copies of individuals in the population.
      * 
-     * @return A list of individuals in the population.
+     * @return A list of copies of individuals in the population.
      */
     public List<Individual> getIndividuals() {
         return new ArrayList<>(this.individuals);
