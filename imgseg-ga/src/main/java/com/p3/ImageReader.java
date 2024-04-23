@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.Map;
 import java.awt.*;
 import java.util.Set;
 
@@ -113,7 +113,7 @@ public class ImageReader {
      * @param outputPath  The path where the image will be saved.
      * @param individual  The individual containing the segments.
      */
-    public static void writeImageWithSegments(String outputPath, Individual individual) {
+    public static void writeImageWithSegments(String outputPath, Individual individual, boolean isWhite) {
         List<Set<Integer>> segments = individual.getSegments();
         int width = Parameters.IMAGE.getImageLength();
         int height = Parameters.IMAGE.getImageHeight();
@@ -122,35 +122,75 @@ public class ImageReader {
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
 
+        int x;
+        int y;
+        int borderColor;
+
         // Draw pixels
         for (int i = 0; i < pixels.size(); i++) {
             List<Integer> pixel = pixels.get(i);
-            int x = i % width;
-            int y = i / width;
-            Color color = new Color(pixel.get(0), pixel.get(1), pixel.get(2));
-            g.setColor(color);
+            x = i % width;
+            y = i / width;
+            if (isWhite) {
+                g.setColor(Color.WHITE);
+            } else {
+                Color color = new Color(pixel.get(0), pixel.get(1), pixel.get(2));
+                g.setColor(color);
+            }
             g.fillRect(x, y, 1, 1);
         }
 
         // Draw segment borders
-        g.setColor(Color.GREEN);
+        if (isWhite) {
+            g.setColor(Color.BLACK);
+            borderColor = Color.BLACK.getRGB();
+        } else {
+            g.setColor(Color.GREEN);
+            borderColor = Color.GREEN.getRGB();
+        }
+
+        boolean nextToBorderPixel;
+        Map<Integer, Integer> segmentMap;
+        Integer indexSegment;
+        int numberOfNeighborsInSegment;
+        Color color;
+
         for (Set<Integer> segment : segments) {
             for (int index : segment) {
-                int x = index % width;
-                int y = index / width;
+                List<Integer> neighbors = individual.getNeighboringPixelIndexes(index, height, width);
+                
+                if (neighbors.size() < 8) {
+                    x = index % width;
+                    y = index / width;
+                    g.drawRect(x, y, 1, 1);
+                    continue;
+                }
 
-                // Check neighboring pixels
-                for (int dx = -1; dx <= 1; dx++) {
-                    for (int dy = -1; dy <= 1; dy++) {
-                        int nx = x + dx;
-                        int ny = y + dy;
-                        int neighborIndex = ny * width + nx;
+                nextToBorderPixel = false;
+                segmentMap = individual.getSegmentMap();
+                indexSegment = segmentMap.get(index);
+                numberOfNeighborsInSegment = 0;
 
-                        // If the neighboring pixel is not in the same segment, draw a border
-                        if (nx >= 0 && nx < width && ny >= 0 && ny < height && !segment.contains(neighborIndex)) {
-                            g.drawRect(x, y, 1, 1);
+                for (int pixelNeighbor : neighbors) {
+                    if (segmentMap.get(pixelNeighbor).equals(indexSegment)) {
+                        numberOfNeighborsInSegment++;
+                    } else {                        
+                        x = pixelNeighbor % width;
+                        y = pixelNeighbor / width;
+
+                        color = new Color(image.getRGB(x, y));
+                        
+                        if (color.getRGB() == borderColor) {
+                            nextToBorderPixel = true;
+                            break;
                         }
                     }
+                }
+                if (!nextToBorderPixel && numberOfNeighborsInSegment < 8) {
+                    x = index % width;
+                    y = index / width;
+                    
+                    g.drawRect(x, y, 1, 1);
                 }
             }
         }

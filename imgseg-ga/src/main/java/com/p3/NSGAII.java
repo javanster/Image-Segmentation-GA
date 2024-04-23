@@ -17,7 +17,7 @@ public class NSGAII {
 
     }
 
-    private int populationSize = 6;
+    private int populationSize = Parameters.POPULATION_SIZE;
     private int lambda = populationSize * 3;
     private OnePointCrosser crossover = new OnePointCrosser();
     // private TwoPointCrosser crossover = new TwoPointCrosser();
@@ -38,7 +38,7 @@ public class NSGAII {
         System.out.println();
 
         for (int k = 0; k < populationSize; k++) {
-            ImageReader.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k));
+            ImageReader.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k), false);
         }
         // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter.png", bestIndividual);
 
@@ -132,7 +132,7 @@ public class NSGAII {
             System.out.println();
             
             for (int k = 0; k < populationSize; k++) {
-                ImageReader.writeImageWithSegments("createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k));
+                ImageReader.writeImageWithSegments("createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k), true);
             }
             // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + ".png", bestIndividual);
         }
@@ -140,10 +140,10 @@ public class NSGAII {
 
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
-        Parameters.POPULATION_SIZE = 20;
+        Parameters.POPULATION_SIZE = 25;
         Parameters.IMAGE = new Image(imagePath);
-        Parameters.SEGMENTS_LOWEBOUND = 14;
-        Parameters.SEGMENTS_UPPERBOUND = 25;
+        Parameters.SEGMENTS_LOWEBOUND = 12;
+        Parameters.SEGMENTS_UPPERBOUND = 47;
         NSGAII nsgaII = new NSGAII();
         nsgaII.run();
     }
