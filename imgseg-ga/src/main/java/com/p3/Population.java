@@ -39,6 +39,12 @@ public class Population {
         this.individuals = individuals;
     }
 
+    public Population(Population population1, Population population2) {
+        List<Individual> individualsFromBoth = population1.getIndividuals();
+        individualsFromBoth.addAll(population2.getIndividuals());
+        this.individuals = individualsFromBoth;
+    }
+
     /**
      * Returns a list of individuals in the population.
      * 
@@ -46,10 +52,6 @@ public class Population {
      */
     public List<Individual> getIndividuals() {
         return new ArrayList<>(this.individuals);
-    }
-
-    public List<Individual> getBestIndividuals() {
-        return ObjectiveFunctions.getParetoFronts(this.individuals).get(0);
     }
 
     public static void main(String[] args) {
