@@ -22,8 +22,6 @@ import java.util.HashSet;
  * Inspired by:
  * Ripon, Kazi Shah Nawaz & Ali, Lasker & Newaz, Sarfaraz & Ma, Jinwen. (2017). A Multi-Objective
  * Evolutionary Algorithm for Color Image Segmentation. 10.1007/978-3-319-71928-3_17
- * 
- * @param image The image the individual is based on.
  */
 public class Individual {
     
@@ -35,7 +33,13 @@ public class Individual {
     private Double connectivityMeasure;
     private Double overallDeviation;
 
-
+    /**
+     * Constructs a new Individual object. The individual is created by creating a minimum spanning tree (MST)
+     * of the image set for the genetic algorithm. The number of trees in the MST is determined by the
+     * numTrees parameter.
+     * 
+     * @param numTrees The number of trees for the MST.
+     */
     public Individual(int numTrees) {
         int imageHeight = Parameters.IMAGE.getImageHeight();
         int imageWidth = Parameters.IMAGE.getImageWith();
@@ -51,31 +55,63 @@ public class Individual {
         this.setSegmentMap();
     }
 
+    /**
+     * Constructs a new Individual object. The individual is created by setting the chromosome to the given chromosome.
+     * 
+     * @param chromosome The chromosome of the individual.
+     */
     public Individual(List<Integer> chromosome) {
         this.chromosome = chromosome;
         this.setSegments();
         this.setSegmentMap();
     }
 
-    
+    /**
+     * Returns a copy of the chromosome of the individual.
+     * 
+     * @return A copy of the chromosome of the individual.
+     */
     public List<Integer> getChromosome() {
         return new ArrayList<>(this.chromosome);
     }
 
+    /**
+     * Sets the chromosome of the individual to the given chromosome.
+     * 
+     * @param chromosome The chromosome to set.
+     */
     public void setChromosome(List<Integer> chromosome) {
         this.chromosome = chromosome;
         this.setSegments();
         this.setSegmentMap();
     }
 
+    /**
+     * Returns the segments of the individual. Each segment is represented as a set of pixels indexes,
+     * referring to the pixels in the image set for the genetic algorithm.
+     * 
+     * @return The segments of the individual.
+     */
     public List<Set<Integer>> getSegments() {
         return this.segments;
     }
 
+    /**
+     * Returns the segment map of the individual. The segment map is a mapping of each pixel to its
+     * corresponding segment index. Each segment is represented as a set of pixels indexes,
+     * referring to the pixels in the image set for the genetic algorithm.
+     * 
+     * @return The segment map of the individual.
+     */
     public Map<Integer, Integer> getSegmentMap() {
         return this.segmentMap;
     }
 
+    /**
+     * Returns the edge value of the individual.
+     * 
+     * @return The edge value of the individual.
+     */
     public double getEdgeValue() {
         if (this.edgeValue == null) {
             this.edgeValue = ObjectiveFunctions.edgeValue(this);
@@ -83,6 +119,11 @@ public class Individual {
         return this.edgeValue;
     }
 
+    /**
+     * Returns the connectivity measure of the individual.
+     * 
+     * @return The connectivity measure of the individual.
+     */
     public double getConnectivityMeasure() {
         if (this.connectivityMeasure == null) {
             this.connectivityMeasure = ObjectiveFunctions.connectivityMeasure(this);
@@ -90,6 +131,11 @@ public class Individual {
         return this.connectivityMeasure;
     }
 
+    /**
+     * Returns the overall deviation of the individual.
+     * 
+     * @return The overall deviation of the individual.
+     */
     public double getOverallDeviation() {
         if (this.overallDeviation == null) {
             this.overallDeviation = ObjectiveFunctions.overallDeviation(this);
@@ -97,6 +143,13 @@ public class Individual {
         return this.overallDeviation;
     }
 
+    /**
+     * Returns the weighted fitness of the individual. The weighted fitness is calculated 
+     * as a sum of weighted values of the edge value, connectivity measure, and overall deviation.
+     * The weights are set in the Parameters class.
+     * 
+     * @return The weighted fitness of the individual.
+     */
     public Double getWeightedFitness() {
         return Parameters.EDGE_WEIGHT * this.getEdgeValue() - Parameters.CONNECTIVITY_WEIGHT * this.getConnectivityMeasure() - Parameters.DEVIATION_WEIGHT * this.getOverallDeviation();
     }
@@ -109,39 +162,6 @@ public class Individual {
         this.edgeValue = null;
         this.connectivityMeasure = null;
         this.overallDeviation = null;
-    }
-
-    /**
-     * Represents an edge in a graph.
-     */
-    class Edge implements Comparable<Edge> {
-        int from;
-        int to;
-        double weight;
-
-        /**
-         * Constructs a new Edge object.
-         *
-         * @param from   the source vertex of the edge
-         * @param to     the destination vertex of the edge
-         * @param weight the weight of the edge
-         */
-        public Edge(int from, int to, double weight) {
-            this.from = from;
-            this.to = to;
-            this.weight = weight;
-        }
-
-        /**
-         * Compares this edge with another edge based on their weights.
-         *
-         * @param other the other edge to compare with
-         * @return a negative integer, zero, or a positive integer as this edge is less than, equal to, or greater than the other edge
-         */
-        @Override
-        public int compareTo(Edge other) {
-            return Double.compare(this.weight, other.weight);
-        }
     }
 
     /**
@@ -181,13 +201,14 @@ public class Individual {
      * the RGB values of the pixels. 
      * The MSTs together contains all pixels of the image
      * 
-     * @param edgeWeights A map where the keys are sets of two pixel indexes and the values are the weights of the edges between the pixels.
+     * @param adjacencyList The adjacency list representation of the image.
      * @param imageHeight The height of the image in pixels.
-     * @param imageLength The length of the image in pixels.
+     * @param imageWidth The width of the image in pixels.
+     * @param numTrees The number of trees in the MST.
      * @return The chromosome of the individual.
      */
-    private List<Integer> getChromosomeFromMST(List<List<Edge>> adjacencyList, int imageHeight, int imageLength, int numTrees) {
-        int pixelCount = imageHeight * imageLength;
+    private List<Integer> getChromosomeFromMST(List<List<Edge>> adjacencyList, int imageHeight, int imageWidth, int numTrees) {
+        int pixelCount = imageHeight * imageWidth;
         List<Integer> chromosome = new ArrayList<>(Collections.nCopies(pixelCount, 0));
 
         Random random = new Random();
@@ -202,23 +223,23 @@ public class Individual {
 
         while (visitedIndexes.size() < pixelCount) {
             Edge minEdge = queue.poll();
-            while (minEdge != null && visitedIndexes.contains(minEdge.to)) {
+            while (minEdge != null && visitedIndexes.contains(minEdge.getTo())) {
                 minEdge = queue.poll();
             }
             if (minEdge == null) {
                 break;
             }
 
-            int originPixelIndex = minEdge.from;
-            int minPixelIndex = minEdge.to;
+            int originPixelIndex = minEdge.getFrom();
+            int minPixelIndex = minEdge.getTo();
             visitedIndexes.add(minPixelIndex);
             addEdgesToQueue(queue, minPixelIndex, adjacencyList, visitedIndexes);
 
             if (chromosome.get(originPixelIndex) == 0) {
-                int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageLength);
+                int graphDirection = getGraphDirection(originPixelIndex, minPixelIndex, imageHeight, imageWidth);
                 chromosome.set(originPixelIndex, graphDirection);
             } else {
-                int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageLength);
+                int graphDirection = getGraphDirection(minPixelIndex, originPixelIndex, imageHeight, imageWidth);
                 chromosome.set(minPixelIndex, graphDirection);
             }
         }
@@ -228,14 +249,14 @@ public class Individual {
     /**
      * Adds the edges of a given node to a priority queue, if the destination node has not been visited.
      *
-     * @param queue       The priority queue to add the edges to.
-     * @param node        The node whose edges are to be added to the queue.
+     * @param queue         The priority queue to add the edges to.
+     * @param node           The node whose edges are to be added to the queue.
      * @param adjacencyList The adjacency list representing the graph.
-     * @param visited     The set of visited nodes.
+     * @param visited       The set of visited nodes.
      */
     private void addEdgesToQueue(PriorityQueue<Edge> queue, int node, List<List<Edge>> adjacencyList, Set<Integer> visited) {
         for (Edge edge : adjacencyList.get(node)) {
-            if (!visited.contains(edge.to)) {
+            if (!visited.contains(edge.getTo())) {
                 queue.add(edge);
             }
         }
@@ -249,15 +270,15 @@ public class Individual {
      * @param originPixelIndex The index of the origin pixel in the image.
      * @param targetPixel The index of the target pixel in the image.
      * @param imageHeight The height of the image in pixels.
-     * @param imageLength The length of the image in pixels.
+     * @param imageWidth The length of the image in pixels.
      * @return The direction of the edge from the origin pixel to the target pixel.
      */
-    public int getGraphDirection(int originPixelIndex, int targetPixel, int imageHeight, int imageLength) {
-        int originRow = originPixelIndex / imageLength;
-        int originCol = originPixelIndex % imageLength;
+    public int getGraphDirection(int originPixelIndex, int targetPixel, int imageHeight, int imageWidth) {
+        int originRow = originPixelIndex / imageWidth;
+        int originCol = originPixelIndex % imageWidth;
         
-        int targetRow = targetPixel / imageLength;
-        int targetCol = targetPixel % imageLength;
+        int targetRow = targetPixel / imageWidth;
+        int targetCol = targetPixel % imageWidth;
         
         if (targetRow == originRow - 1) {
             if (targetCol == originCol - 1) {
@@ -292,17 +313,17 @@ public class Individual {
      * 
      * @param pixelIndex The index of the pixel in the image.
      * @param imageHeight The height of the image in pixels.
-     * @param imageLength The length of the image in pixels.
+     * @param imageWidth The width of the image in pixels.
      * @return A list of the indexes of the neighboring pixels of the pixel at index pixelIndex.
      */
-    public List<Integer> getNeighboringPixelIndexes(int pixelIndex, int imageHeight, int imageLength) {
-        if (pixelIndex < 0 || pixelIndex >= imageHeight * imageLength) {
+    public List<Integer> getNeighboringPixelIndexes(int pixelIndex, int imageHeight, int imageWidth) {
+        if (pixelIndex < 0 || pixelIndex >= imageHeight * imageWidth) {
             throw new IllegalArgumentException("Invalid pixel index");
         }
 
         List<Integer> neighbors = new ArrayList<>();
-        int row = pixelIndex / imageLength;
-        int col = pixelIndex % imageLength;
+        int row = pixelIndex / imageWidth;
+        int col = pixelIndex % imageWidth;
 
         int[] offsets = {-1, 0, 1};
 
@@ -311,8 +332,8 @@ public class Individual {
                 int newRow = row + rowOffset;
                 int newCol = col + colOffset;
 
-                if (newRow >= 0 && newRow < imageHeight && newCol >= 0 && newCol < imageLength) {
-                    int neighborIndex = newRow * imageLength + newCol;
+                if (newRow >= 0 && newRow < imageHeight && newCol >= 0 && newCol < imageWidth) {
+                    int neighborIndex = newRow * imageWidth + newCol;
                     if (neighborIndex != pixelIndex) {
                         neighbors.add(neighborIndex);
                     }
@@ -368,17 +389,17 @@ public class Individual {
      * 
      * @param pixelIndex The index of the pixel in the image.
      * @param imageHeight The height of the image in pixels.
-     * @param imageLength The length of the image in pixels.
+     * @param imageWidth The length of the image in pixels.
      * @param direction The direction of the neighboring pixel.
      * @return The index of the neighboring pixel of the pixel at index pixelIndex based on the direction.
      */
-    private int getNeighborFromGraph(int pixelIndex, int imageHeight, int imageLength, int direction) {
-        int row = pixelIndex / imageLength;
-        int col = pixelIndex % imageLength;
+    private int getNeighborFromGraph(int pixelIndex, int imageHeight, int imageWidth, int direction) {
+        int row = pixelIndex / imageWidth;
+        int col = pixelIndex % imageWidth;
 
         switch (direction) {
             case 1: // right
-                if (col + 1 < imageLength) {
+                if (col + 1 < imageWidth) {
                     return pixelIndex + 1;
                 }
                 break;
@@ -389,32 +410,32 @@ public class Individual {
                 break;
             case 3: // up
                 if (row - 1 >= 0) {
-                    return pixelIndex - imageLength;
+                    return pixelIndex - imageWidth;
                 }
                 break;
             case 4: // down
                 if (row + 1 < imageHeight) {
-                    return pixelIndex + imageLength;
+                    return pixelIndex + imageWidth;
                 }
                 break;
             case 5: // top right
-                if (row - 1 >= 0 && col + 1 < imageLength) {
-                    return pixelIndex - imageLength + 1;
+                if (row - 1 >= 0 && col + 1 < imageWidth) {
+                    return pixelIndex - imageWidth + 1;
                 }
                 break;
             case 6: // bottom right
-                if (row + 1 < imageHeight && col + 1 < imageLength) {
-                    return pixelIndex + imageLength + 1;
+                if (row + 1 < imageHeight && col + 1 < imageWidth) {
+                    return pixelIndex + imageWidth + 1;
                 }
                 break;
             case 7: // top left
                 if (row - 1 >= 0 && col - 1 >= 0) {
-                    return pixelIndex - imageLength - 1;
+                    return pixelIndex - imageWidth - 1;
                 }
                 break;
             case 8: // bottom left
                 if (row + 1 < imageHeight && col - 1 >= 0) {
-                    return pixelIndex + imageLength - 1;
+                    return pixelIndex + imageWidth - 1;
                 }
                 break;
             default:
