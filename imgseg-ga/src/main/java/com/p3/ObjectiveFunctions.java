@@ -270,11 +270,11 @@ public class ObjectiveFunctions {
         List<Individual> individualsCopy = new ArrayList<>(individuals);
 
         // Edge value
-        individualsCopy.sort((i1, i2) -> Double.compare(i1.getEdgeValue(), i2.getEdgeValue())); // worst first, i.e. min first
+        individualsCopy.sort((i1, i2) -> Double.compare(i2.getEdgeValue(), i1.getEdgeValue())); // best first, i.e. max value first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minEdgeValue = individualsCopy.get(0).getEdgeValue();
-        double maxEdgeValue = individualsCopy.get(l - 1).getEdgeValue();
+        double minEdgeValue = individualsCopy.get(l - 1).getEdgeValue();
+        double maxEdgeValue = individualsCopy.get(0).getEdgeValue();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
             double edgeValueOfNext = individualsCopy.get(i + 1).getEdgeValue();
@@ -283,11 +283,11 @@ public class ObjectiveFunctions {
         }
 
         // Connectivity measure
-        individualsCopy.sort((i1, i2) -> Double.compare(i2.getConnectivityMeasure(), i1.getConnectivityMeasure())); // worst first, i.e. max value first
+        individualsCopy.sort((i1, i2) -> Double.compare(i1.getConnectivityMeasure(), i2.getConnectivityMeasure())); // best first, i.e. min value first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minConnectivityMeasure = individualsCopy.get(l - 1).getConnectivityMeasure();
-        double maxConnectivityMeasure = individualsCopy.get(0).getConnectivityMeasure();
+        double minConnectivityMeasure = individualsCopy.get(0).getConnectivityMeasure();
+        double maxConnectivityMeasure = individualsCopy.get(l - 1).getConnectivityMeasure();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
             double connectivityMeasureOfNext = individualsCopy.get(i + 1).getConnectivityMeasure();
@@ -296,11 +296,11 @@ public class ObjectiveFunctions {
         }
 
         // Overall deviation
-        individualsCopy.sort((i1, i2) -> Double.compare(i2.getOverallDeviation(), i1.getOverallDeviation())); // worst first, i.e. max value first
+        individualsCopy.sort((i1, i2) -> Double.compare(i1.getOverallDeviation(), i2.getOverallDeviation())); // best first, i.e. min value first
         distances.replace(individualsCopy.get(0), Double.POSITIVE_INFINITY);
         distances.replace(individualsCopy.get(l - 1), Double.POSITIVE_INFINITY);
-        double minOverallDeviationValue = individualsCopy.get(l - 1).getOverallDeviation();
-        double maxOverallDeviationValue = individualsCopy.get(0).getOverallDeviation();
+        double minOverallDeviationValue = individualsCopy.get(0).getOverallDeviation();
+        double maxOverallDeviationValue = individualsCopy.get(l - 1).getOverallDeviation();
         for (int i = 1; i < l - 1; i++) {
             double distanceValue = distances.get(individualsCopy.get(i));
             double overallDeviationValueNext = individualsCopy.get(i + 1).getOverallDeviation();
