@@ -133,18 +133,20 @@ public class ObjectiveFunctions {
      * @return The Euclidean distance between the two pixels.
      */
     public static double euclideanDistance(List<Integer> pixel1, List<Integer> pixel2) {
-        return Math.sqrt(Math.pow(pixel1.get(0) - pixel2.get(0), 2) + 
-            Math.pow(pixel1.get(1) - pixel2.get(1), 2) + 
-            Math.pow(pixel1.get(2) - pixel2.get(2), 2));
+        return Math.sqrt(Math.pow(pixel1.get(0) - pixel2.get(0), 2)
+            + Math.pow(pixel1.get(1) - pixel2.get(1), 2)
+            + Math.pow(pixel1.get(2) - pixel2.get(2), 2));
     }
 
     /**
      * Calculates the Pareto fronts for a given list of individuals.
      *
      * @param individuals the list of individuals
-     * @return a list of lists, where each inner list represents a Pareto front
+     * @return a list of lists, where each inner lists represents a Pareto front, ordered by rank
      */
     public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
+        
+        // Resetting objective values of individuals
         for (Individual individual : individuals) {
             individual.resetObjectiveValues();
         }
@@ -188,17 +190,16 @@ public class ObjectiveFunctions {
     
             paretoFronts.add(paretoFront);
         }
-
-        // resetting objective values
-        /* for (List<Individual> front : paretoFronts) {
-            for (Individual individual : front) {
-                individual.resetObjectiveValues();
-            }
-        } */
     
         return paretoFronts;
     }
 
+    /**
+     * Returns a map where the keys are individuals and the values are their corresponding Pareto front ranks.
+     * 
+     * @param individuals The list of individuals.
+     * @return Map where the keys are individuals and the values are their Pareto front ranks.
+     */
     public static Map<Individual, Integer> getParetoFrontsMap(List<Individual> individuals) {
         Map<Individual, Integer> paretoFrontsMap = new HashMap<>();
         List<List<Individual>> paretoFronts = getParetoFronts(individuals);
@@ -256,7 +257,7 @@ public class ObjectiveFunctions {
      * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
      * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), p. 185. https://doi.org/10.1109/4235.996017 
      * 
-     * @param population The population of individuals.
+     * @param individuals The list of individuals.
      * @return Map where the keys are individuals and the values are their crowding distances.
      */
     public static Map<Individual, Double> getCrowdingDistances(List<Individual> individuals) {
@@ -323,24 +324,21 @@ public class ObjectiveFunctions {
         System.out.println(overallDeviation(individual));
         Population population = new Population();
 
-
-        long startTime = System.nanoTime();
         List<List<Individual>> paretoRanks = getParetoFronts(population.getIndividuals());
-        long endTime = System.nanoTime();
-        long durationNano = endTime - startTime;
-        double durationSeconds = durationNano / 1e9; // Convert nanoseconds to seconds
-        System.out.println("Execution time of getParetoFronts: " + durationSeconds + " seconds");
 
         List<Individual> paretoFront = paretoRanks.get(0);
         List<Individual> secondParetoFront = paretoRanks.get(1);
         List<Individual> thirdParetoFront = paretoRanks.get(2);
+
+         // Should all print false
         for (Individual p : paretoFront) {
             System.out.println(isDominated(p, secondParetoFront));
         }
+
+        // Should all print false
         for (Individual p : secondParetoFront) {
             System.out.println(isDominated(p, thirdParetoFront));
         }
-        
 
         System.out.println("Getting crowding distances");
         Map<Individual, Double> crowdingDistances = getCrowdingDistances(population.getIndividuals());
