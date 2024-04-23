@@ -18,9 +18,9 @@ public class Image {
      * @param filePath The path to the image file.
      */
     public Image(String filePath) {
-        this.pixels = ImageReader.getImagePixels(filePath);
-        this.imageHeight = ImageReader.getImageDimensions(filePath)[0];
-        this.imageWidth = ImageReader.getImageDimensions(filePath)[1];
+        this.pixels = ImageReaderWriter.getImagePixels(filePath);
+        this.imageHeight = ImageReaderWriter.getImageDimensions(filePath)[0];
+        this.imageWidth = ImageReaderWriter.getImageDimensions(filePath)[1];
     }
 
     /**

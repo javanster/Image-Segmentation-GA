@@ -38,7 +38,7 @@ public class NSGAII {
         System.out.println();
 
         for (int k = 0; k < populationSize; k++) {
-            ImageReader.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k), false);
+            ImageReaderWriter.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k), false);
         }
         // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter.png", bestIndividual);
 
@@ -132,7 +132,7 @@ public class NSGAII {
             System.out.println();
             
             for (int k = 0; k < populationSize; k++) {
-                ImageReader.writeImageWithSegments("createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k), true);
+                ImageReaderWriter.writeImageWithSegments("createdImages/test" + i + "-" + k + ".png", population.getIndividuals().get(k), true);
             }
             // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + ".png", bestIndividual);
         }

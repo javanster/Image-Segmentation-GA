@@ -44,7 +44,7 @@ public class WeightedGA {
         System.out.println();
 
         for (int k = 0; k < (int) (populationSize / 10); k++) {
-            ImageReader.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k), true);
+            ImageReaderWriter.writeImageWithSegments("createdImages/starter-" + k + ".png", population.getIndividuals().get(k), true);
         }
         // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/starter.png", bestIndividual);
 
@@ -112,7 +112,7 @@ public class WeightedGA {
             // ImageReader.writeImageWithSegments(bestIndividual.getImage().getPixels(), bestIndividual.getImage().getImageLength(), bestIndividual.getImage().getImageHeight(), "createdImages/test" + i + ".png", bestIndividual);
         }
         for (int k = 0; k < (int) (populationSize / 10); k++) {
-            ImageReader.writeImageWithSegments("createdImages/testFinal-" + k + ".png", population.getIndividuals().get(k), true);
+            ImageReaderWriter.writeImageWithSegments("createdImages/testFinal-" + k + ".png", population.getIndividuals().get(k), true);
         }
     }
 

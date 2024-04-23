@@ -77,7 +77,7 @@ public class NSGAII_V2 {
         
         for (int i = 0; i < currentBestIndividuals.size(); i++) {
             Individual ind = currentBestIndividuals.get(i);
-            ImageReader.writeImageWithSegments("evaluator/student_segments/result" + i + ".png", ind, true);
+            ImageReaderWriter.writeImageWithSegments("evaluator/student_segments/result" + i + ".png", ind, true);
         }
     }
 
