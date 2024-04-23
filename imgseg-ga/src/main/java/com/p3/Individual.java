@@ -104,6 +104,10 @@ public class Individual {
         return this.overallDeviation;
     }
 
+    public Double getWeightedFitness() {
+        return Parameters.EDGE_WEIGHT * this.getEdgeValue() - Parameters.CONNECTIVITY_WEIGHT * this.getConnectivityMeasure() - Parameters.DEVIATION_WEIGHT * this.getOverallDeviation();
+    }
+
     /**
      * Resets the objective values of the individual, so that they are recalculated 
      * the next time they are accessed.

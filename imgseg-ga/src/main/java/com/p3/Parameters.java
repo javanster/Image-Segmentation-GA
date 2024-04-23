@@ -20,4 +20,7 @@ public class Parameters {
     public static MutationHandler MUTATION_HANDLER;
     public static double MUTATION_PROBABILITY;
     public static int MUTATION_STEP_SIZE;
+    public static double EDGE_WEIGHT;
+    public static double CONNECTIVITY_WEIGHT;
+    public static double DEVIATION_WEIGHT;
 }
