@@ -33,29 +33,30 @@ public class NSGAII_V2 {
         }
         System.out.println("Num pareto fronts before reduction: " + ObjectiveFunctions.getParetoFronts(population.getIndividuals()).size());
         System.out.println("Size of first pareto front before reduction: " + ObjectiveFunctions.getParetoFronts(population.getIndividuals()).get(0).size());
-        population = Parameters.PARENT_SELECTOR.selectParents(population);
+        BestParentSelector bestParentSelector = new BestParentSelector();
+        population = bestParentSelector.selectParents(population);
         List<Individual> currentBestIndividuals = ObjectiveFunctions.getParetoFronts(population.getIndividuals()).get(0);
         System.out.println("Size of first pareto front after reduction: " + currentBestIndividuals.size());
         for (int i = 0; i < currentBestIndividuals.size(); i++) {
             Individual ind = currentBestIndividuals.get(i);
-            ImageReader.writeImageWithSegments("test" + i + ".png", ind);
+            ImageReader.writeImageWithSegments("evaluator/student_segments/result" + i + ".png", ind, true);
         }
         
     }
 
     public static void main(String[] args) {
-        Parameters.IMAGE = new Image("training_images/118035/Test image.jpg");
-        Parameters.SEGMENTS_LOWEBOUND = 12;
-        Parameters.SEGMENTS_UPPERBOUND = 47;
-        Parameters.POPULATION_SIZE = 30;
+        Parameters.IMAGE = new Image("training_images/86016/Test image.jpg");
+        Parameters.SEGMENTS_LOWEBOUND = 4;
+        Parameters.SEGMENTS_UPPERBOUND = 41;
+        Parameters.POPULATION_SIZE = 100;
         Parameters.PARENT_SELECTOR = new TournamentParentSelector();
         Parameters.TOURNAMENT_SIZE = 4;
         Parameters.IS_TOURNAMENT_REPLACEMENT_ALLOWED = false;
-        Parameters.GENERATIONS = 40;
+        Parameters.GENERATIONS = 1;
         Parameters.CROSSOVER_HANDLER = new OnePointCrosser();
-        Parameters.MUTATION_PROBABILITY = 0.0000;
+        Parameters.MUTATION_PROBABILITY = 0.1;
         Parameters.MUTATION_STEP_SIZE = 7;
-        Parameters.MUTATION_HANDLER = new RandomResettingMutation();
+        Parameters.MUTATION_HANDLER = new StudassMutator();
 
         NSGAII_V2.run();
     }
