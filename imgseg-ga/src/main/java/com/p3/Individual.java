@@ -38,14 +38,14 @@ public class Individual {
 
     public Individual(int numTrees) {
         int imageHeight = Parameters.IMAGE.getImageHeight();
-        int imageLength = Parameters.IMAGE.getImageLength();
+        int imageWidth = Parameters.IMAGE.getImageWith();
 
         this.edgeValue = null;
         this.connectivityMeasure = null;
         this.overallDeviation = null;
 
         List<List<Edge>> adjacencyList = this.getAdjacencyList(Parameters.IMAGE);
-        this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageLength, numTrees);
+        this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageWidth, numTrees);
 
         this.setSegments();
         this.setSegmentMap();
@@ -155,13 +155,13 @@ public class Individual {
     private List<List<Edge>> getAdjacencyList(Image image) {
         List<List<Integer>> pixels = image.getPixels();
         int imageHeight = image.getImageHeight();
-        int imageLength = image.getImageLength();
+        int imageWidth = image.getImageWith();
 
         List<List<Edge>> adjacencyList = new ArrayList<>(pixels.size());
 
         for (int i = 0; i < pixels.size(); i++) {
             List<Integer> pixel = pixels.get(i);
-            List<Integer> neighbors = this.getNeighboringPixelIndexes(i, imageHeight, imageLength);
+            List<Integer> neighbors = this.getNeighboringPixelIndexes(i, imageHeight, imageWidth);
 
             List<Edge> edges = new ArrayList<>();
             for (int neighborIndex : neighbors) {
@@ -332,7 +332,7 @@ public class Individual {
         DisjointSet ds = new DisjointSet(pixelCount);
 
         for (int i = 0; i < pixelCount; i++) {
-            int neighbor = getNeighborFromGraph(i, Parameters.IMAGE.getImageHeight(), Parameters.IMAGE.getImageLength(), chromosome.get(i));
+            int neighbor = getNeighborFromGraph(i, Parameters.IMAGE.getImageHeight(), Parameters.IMAGE.getImageWith(), chromosome.get(i));
             if (neighbor != -1) {
                 ds.union(i, neighbor);
             }

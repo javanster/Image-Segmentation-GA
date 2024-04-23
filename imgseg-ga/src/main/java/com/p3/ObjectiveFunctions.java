@@ -29,12 +29,12 @@ public class ObjectiveFunctions {
         double edgeValue = 0.0;
         List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
         int imageHeight = Parameters.IMAGE.getImageHeight();
-        int imageLength = Parameters.IMAGE.getImageLength();
+        int imageWidth = Parameters.IMAGE.getImageWith();
         Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
             int segmentIndex = segmentMap.get(i);
-            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageLength);
+            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageWidth);
             for (int j : neighboringPixelIndexes) {
                 if (segmentIndex != segmentMap.get(j)) {
                     edgeValue += euclideanDistance(pixels.get(i), pixels.get(j));
@@ -58,12 +58,12 @@ public class ObjectiveFunctions {
         double connectivityMeasure = 0.0;
         List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
         int imageHeight = Parameters.IMAGE.getImageHeight();
-        int imageLength = Parameters.IMAGE.getImageLength();
+        int imageWidth = Parameters.IMAGE.getImageWith();
         Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
             int segmentIndex = segmentMap.get(i);
-            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageLength);
+            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageWidth);
             for (Integer j : neighboringPixelIndexes) {
                 if (segmentIndex != segmentMap.get(j)) {
                     connectivityMeasure += 1.0 / 8; // alernatively: (double) 1 / individual.getGraphDirection(i, j, imageHeight, imageLength);

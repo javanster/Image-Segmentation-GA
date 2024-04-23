@@ -115,7 +115,7 @@ public class ImageReader {
      */
     public static void writeImageWithSegments(String outputPath, Individual individual, boolean isWhite) {
         List<Set<Integer>> segments = individual.getSegments();
-        int width = Parameters.IMAGE.getImageLength();
+        int width = Parameters.IMAGE.getImageWith();
         int height = Parameters.IMAGE.getImageHeight();
         List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
