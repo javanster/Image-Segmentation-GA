@@ -62,8 +62,10 @@ public class ObjectiveFunctions {
         Map<Integer, Integer> segmentMap = individual.getSegmentMap();
 
         for (int i = 0; i < pixels.size(); i++) {
-            for (Integer j : individual.getNeighboringPixelIndexes(i, imageHeight, imageLength)) {
-                if (!segmentMap.get(i).equals(segmentMap.get(j))) {
+            int segmentIndex = segmentMap.get(i);
+            List<Integer> neighboringPixelIndexes = individual.getNeighboringPixelIndexes(i, imageHeight, imageLength);
+            for (Integer j : neighboringPixelIndexes) {
+                if (segmentIndex != segmentMap.get(j)) {
                     connectivityMeasure += 1.0 / 8; // alernatively: (double) 1 / individual.getGraphDirection(i, j, imageHeight, imageLength);
                 }
             }
@@ -86,9 +88,9 @@ public class ObjectiveFunctions {
         List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
         for (Set<Integer> segment : individual.getSegments()) {
-            List<Integer> centroid = getCentroid(individual, segment);
-            for (Integer i : segment) {
-                segmentDeviation += euclideanDistance(pixels.get(i), centroid);
+            List<Integer> centroid = getCentroid(segment);
+            for (Integer pixelIndex : segment) {
+                segmentDeviation += euclideanDistance(pixels.get(pixelIndex), centroid);
             }
         }
         return segmentDeviation;
@@ -99,11 +101,10 @@ public class ObjectiveFunctions {
      * The centroid is the average RGB values of the pixels in the segment.
      * Helper method for overallDeviation.
      * 
-     * @param individual The individual representing the image.
      * @param segment The segment of the image.
      * @return The centroid of the segment.
      */
-    private static List<Integer> getCentroid(Individual individual, Set<Integer> segment) {        
+    private static List<Integer> getCentroid(Set<Integer> segment) {        
         int redSum = 0;
         int greenSum = 0;
         int blueSum = 0;
@@ -144,6 +145,10 @@ public class ObjectiveFunctions {
      * @return a list of lists, where each inner list represents a Pareto front
      */
     public static List<List<Individual>> getParetoFronts(List<Individual> individuals) {
+        for (Individual individual : individuals) {
+            individual.resetObjectiveValues();
+        }
+
         int n = individuals.size();
         int[] dominatedCount = new int[n];
         List<Integer>[] dominates = new ArrayList[n];
@@ -185,11 +190,11 @@ public class ObjectiveFunctions {
         }
 
         // resetting objective values
-        for (List<Individual> front : paretoFronts) {
+        /* for (List<Individual> front : paretoFronts) {
             for (Individual individual : front) {
                 individual.resetObjectiveValues();
             }
-        }
+        } */
     
         return paretoFronts;
     }
@@ -305,34 +310,6 @@ public class ObjectiveFunctions {
 
         return distances;
     }
-
-    /**
-     * Rank the individuals in a list based on Pareto front and crowding distance.
-     * 
-     * Based on:
-     * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
-     * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), p. 185. https://doi.org/10.1109/4235.996017 
-     * 
-     * @param individuals The individuals to rank.
-     * @return A list of individuals ranked by Pareto front and crowding distance.
-     
-    public static List<Individual> nonDominatedSort(List<Individual> individuals) {
-        System.out.println("Getting paretoFronts ...");
-        List<List<Individual>> paretoFronts = ObjectiveFunctions.getParetoFronts(individuals);
-        System.out.println("Getting crowdingDistances ...");
-        Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(individuals);
-
-        for (List<Individual> front : paretoFronts) {
-            front.sort(Comparator.comparingDouble(crowdingDistances::get).reversed());
-        }
-
-        List<Individual> rankedIndividuals = new ArrayList<>();
-        for (List<Individual> front : paretoFronts) {
-            rankedIndividuals.addAll(front);
-        }
-        System.out.println("Ranking individuals done");
-        return rankedIndividuals;
-    } */
     
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
