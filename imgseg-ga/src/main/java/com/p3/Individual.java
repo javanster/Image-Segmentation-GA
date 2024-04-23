@@ -47,18 +47,11 @@ public class Individual {
         List<List<Edge>> adjacencyList = this.getAdjacencyList(Parameters.IMAGE);
         this.chromosome = this.getChromosomeFromMST(adjacencyList, imageHeight, imageLength, numTrees);
 
-        // List<Integer> chromosome = new ArrayList<>();
-        // Random random = new Random();
-        // for (int i = 0; i < imageHeight * imageLength; i++) {
-        //     chromosome.add(random.nextInt(9));
-        // }
-        // this.chromosome = chromosome;
-
         this.setSegments();
         this.setSegmentMap();
     }
 
-    public Individual(List<Integer> chromosome, Individual parent) {
+    public Individual(List<Integer> chromosome) {
         this.chromosome = chromosome;
         this.setSegments();
         this.setSegmentMap();
