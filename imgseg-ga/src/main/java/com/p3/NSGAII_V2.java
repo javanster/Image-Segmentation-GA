@@ -69,9 +69,9 @@ public class NSGAII_V2 {
         double numSegmentsSum = 0;
 
         for (Individual individual : currentBestIndividuals) {
-            edgeValueValueSum += ObjectiveFunctions.edgeValue(individual);
-            connectivityMeasureSum += ObjectiveFunctions.connectivityMeasure(individual);
-            overallDeviationSum += ObjectiveFunctions.overallDeviation(individual);
+            edgeValueValueSum += individual.getEdgeValue();
+            connectivityMeasureSum += individual.getConnectivityMeasure();
+            overallDeviationSum += individual.getOverallDeviation();
             numSegmentsSum += individual.getSegments().size();
         }
 
@@ -136,8 +136,8 @@ public class NSGAII_V2 {
             }
 
             Individual ind = currentBestIndividuals.get(i);
-            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_1/" + i + ".png", ind, false);
-            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_2/" + i + ".png", ind, true);
+            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_1/" + i + ".jpg", ind, false);
+            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_2/" + i + ".jpg", ind, true);
         }
     }
 
@@ -147,7 +147,7 @@ public class NSGAII_V2 {
      * @param population the population to reduce.
      * @return a new population with unique individuals.
      */
-    private static Population reduceToUniqueIndividuals(Population population) {
+    public static Population reduceToUniqueIndividuals(Population population) {
         List<List<Integer>> uniqueChromosomes = new ArrayList<>();
         for (Individual individual : population.getIndividuals()) {
             if (!uniqueChromosomes.contains(individual.getChromosome())) {
@@ -163,17 +163,17 @@ public class NSGAII_V2 {
     }
 
     public static void main(String[] args) {
-        Parameters.IMAGE_NAME = "118035";
+        Parameters.IMAGE_NAME = "353013";
         Parameters.IMAGE = new Image("training_images/" + Parameters.IMAGE_NAME + "/Test image.jpg");
-        Parameters.SEGMENTS_LOWEBOUND = 4;
-        Parameters.SEGMENTS_UPPERBOUND = 41;
-        Parameters.POPULATION_SIZE = 30;
+        Parameters.SEGMENTS_LOWEBOUND = 6;
+        Parameters.SEGMENTS_UPPERBOUND = 15;
+        Parameters.POPULATION_SIZE = 100;
         Parameters.PARENT_SELECTOR = new TournamentParentSelector();
-        Parameters.TOURNAMENT_SIZE = 4;
+        Parameters.TOURNAMENT_SIZE = 7;
         Parameters.IS_TOURNAMENT_REPLACEMENT_ALLOWED = false;
-        Parameters.GENERATIONS = 1;
+        Parameters.GENERATIONS = 50;
         Parameters.CROSSOVER_HANDLER = new OnePointCrosser();
-        Parameters.MUTATION_PROBABILITY = 0.2;
+        Parameters.MUTATION_PROBABILITY = 0.9;
         Parameters.MUTATION_STEP_SIZE = 7;
         Parameters.MUTATION_HANDLER = new StudassMutator();
 
