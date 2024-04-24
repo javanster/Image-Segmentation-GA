@@ -39,10 +39,10 @@ public class TournamentParentSelector implements ParentSelector{
                 List<Individual> individuals = new ArrayList<>(population.getIndividuals());
                 int index = random.nextInt(population.getIndividuals().size());
                 if (Parameters.IS_TOURNAMENT_REPLACEMENT_ALLOWED) {
-                    // If replacement is allowed, add a random individual from the population (with replacement)
+                    // If replacement is allowed, an individual can be selected more than once
                     tournament.add(individuals.get(index));
                 } else {
-                    // If replacement is not allowed, remove the selected individual from the population
+                    // If replacement is not allowed, no individual can be selected more than once
                     tournament.add(individuals.remove(index));
                 }
             }
