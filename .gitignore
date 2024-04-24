@@ -3,4 +3,4 @@ createdImages/*
 !createdImages/.gitinclude
 evaluator/optimal_segments/*
 evaluator/student_segments/*
-results/
+results_MOEA/

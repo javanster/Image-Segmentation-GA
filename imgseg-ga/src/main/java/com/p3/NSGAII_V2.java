@@ -107,7 +107,7 @@ public class NSGAII_V2 {
         List<Individual> currentBestIndividuals = getNonDominatedIndividuals(population);
         
         // Delete previous results of type 1
-        File type1Dir = new File("results/" + Parameters.IMAGE_NAME + "/type_1/");
+        File type1Dir = new File("results_MOEA/" + Parameters.IMAGE_NAME + "/type_1/");
         File[] type1Files = type1Dir != null ? type1Dir.listFiles() : null;
         if (type1Files != null) {
             for (File file : type1Files) {
@@ -116,7 +116,7 @@ public class NSGAII_V2 {
         }
 
         // Delete previous results of type 2
-        File type2Dir = new File("results/" + Parameters.IMAGE_NAME + "/type_2/");
+        File type2Dir = new File("results_MOEA/" + Parameters.IMAGE_NAME + "/type_2/");
         File[] type2Files = type2Dir != null ? type2Dir.listFiles() : null;
         if (type2Files != null) {
             for (File file : type2Files) {
@@ -136,8 +136,8 @@ public class NSGAII_V2 {
             }
 
             Individual ind = currentBestIndividuals.get(i);
-            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_1/" + i + ".jpg", ind, false);
-            ImageReaderWriter.writeImageWithSegments("results/" + Parameters.IMAGE_NAME + "/type_2/" + i + ".jpg", ind, true);
+            ImageReaderWriter.writeImageWithSegments("results_MOEA/" + Parameters.IMAGE_NAME + "/type_1/" + i + ".jpg", ind, false);
+            ImageReaderWriter.writeImageWithSegments("results_MOEA/" + Parameters.IMAGE_NAME + "/type_2/" + i + ".jpg", ind, true);
         }
     }
 
