@@ -11,6 +11,7 @@ public class Parameters {
     public static int SEGMENTS_LOWEBOUND;
     public static int SEGMENTS_UPPERBOUND;
     public static int POPULATION_SIZE;
+    public static String IMAGE_NAME;
     public static Image IMAGE;
     public static ParentSelector PARENT_SELECTOR;
     public static int TOURNAMENT_SIZE;
