@@ -49,18 +49,19 @@ public class TournamentParentSelector implements ParentSelector{
 
             Individual bestIndividual = tournament.get(0);
             int bestParetoRank = paretoFrontsMap.get(bestIndividual);
-            for (Individual individual : tournament) {
-                if (paretoFrontsMap.get(individual) < bestParetoRank) {
-                    bestParetoRank = paretoFrontsMap.get(individual);
-                    bestIndividual = individual;
-                }
-            }
-
             List<Individual> bestIndividuals = new ArrayList<>();
+            
             for (Individual individual : tournament) {
-                if (paretoFrontsMap.get(individual) == bestParetoRank) {
+                int individualParetoRank = paretoFrontsMap.get(individual);
+                
+                if (individualParetoRank < bestParetoRank) {
+                    bestParetoRank = individualParetoRank;
+                    bestIndividual = individual;
+                    bestIndividuals.clear();
                     bestIndividuals.add(individual);
-                } 
+                } else if (individualParetoRank == bestParetoRank) {
+                    bestIndividuals.add(individual);
+                }
             }
 
             if (bestIndividuals.size() == 1) {
@@ -72,7 +73,7 @@ public class TournamentParentSelector implements ParentSelector{
                         allIndividualsInParetoFront.add(individual);
                     }
                 }
-                Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(allIndividualsInParetoFront); // This should proably be saved, to save computation time
+                Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(allIndividualsInParetoFront);
                 Individual bestIndividualInTournament = bestIndividuals.get(0);
                 double bestCrowdingDistance = crowdingDistances.get(bestIndividualInTournament);
                 for (Individual individual : bestIndividuals) {
