@@ -12,17 +12,26 @@ public class Population {
 
     /**
      * Creates a population of individuals. The number of individuals in the population is determined by the
-     * Parameters.POPULATION_SIZE parameter. Each individual is created with a random number of segments
-     * between Parameters.SEGMENTS_LOWEBOUND and Parameters.SEGMENTS_UPPERBOUND.
+     * Parameters.POPULATION_SIZE parameter. Individuals are created with a random number of segments between
+     * Parameters.SEGMENTS_LOWEBOUND and Parameters.SEGMENTS_UPPERBOUND, with at least one individual for each
+     * segment count.
      */
     public Population() {
         List<Individual> individuals = new ArrayList<>();
 
+
         for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
-            // pick a random number of segments between lowerBound and upperBound
-            int numSegments = Parameters.SEGMENTS_LOWEBOUND + (int) (Math.random() * (Parameters.SEGMENTS_UPPERBOUND - Parameters.SEGMENTS_LOWEBOUND));
+            int numSegments = i;
+            
+            // Ensures that every segment count has at least one individual
+            if (numSegments >= Parameters.SEGMENTS_LOWEBOUND && numSegments <= Parameters.SEGMENTS_UPPERBOUND) {
+                individuals.add(new Individual(i));
+            } else {
+                // pick a random number of segments between lowerBound and upperBound
+                numSegments = Parameters.SEGMENTS_LOWEBOUND + (int) (Math.random() * (Parameters.SEGMENTS_UPPERBOUND - Parameters.SEGMENTS_LOWEBOUND));
+                individuals.add(new Individual(numSegments));
+            }
             System.out.println("Creating individual " + (i + 1) + " of " + Parameters.POPULATION_SIZE + ", with " + numSegments + " segments");
-            individuals.add(new Individual(numSegments));
         }
 
         this.individuals = individuals;
