@@ -9,8 +9,7 @@ import java.util.Map;
 public class WeightedGA {
     
     /**
-     * This is the Non-Dominated Sorting Genetic Algorithm II (NSGA-II) constructor.
-     * 
+     * This is the Weighted Genetic Algorithm constructor.
      * 
      */
     public WeightedGA() {
