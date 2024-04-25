@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * Class for running our second version of the NSGA-II algorithm.
  */
-public class NSGAII_V2 {
+public class NSGAII {
 
     /**
      * Run the NSGA-II algorithm.
@@ -177,7 +177,7 @@ public class NSGAII_V2 {
         Parameters.MUTATION_STEP_SIZE = 7;
         Parameters.MUTATION_HANDLER = new StudassMutator();
 
-        NSGAII_V2.runGA();
+        NSGAII.runGA();
     }
     
 }
