@@ -15,6 +15,7 @@ public class TournamentParentSelector implements ParentSelector{
      * Selects parents for the next generation using a crowding tournament selection.
      * 
      * Based on:
+     * 
      * Eiben & Smith, 2015, p. 84-86.
      * 
      * Ripon, K. S. N., Ali, L. E., Newaz, S., & Ma, J. (2017, November 28). A multi-objective evolutionary
@@ -38,28 +39,29 @@ public class TournamentParentSelector implements ParentSelector{
                 List<Individual> individuals = new ArrayList<>(population.getIndividuals());
                 int index = random.nextInt(population.getIndividuals().size());
                 if (Parameters.IS_TOURNAMENT_REPLACEMENT_ALLOWED) {
-                    // If replacement is allowed, add a random individual from the population (with replacement)
+                    // If replacement is allowed, an individual can be selected more than once
                     tournament.add(individuals.get(index));
                 } else {
-                    // If replacement is not allowed, remove the selected individual from the population
+                    // If replacement is not allowed, no individual can be selected more than once
                     tournament.add(individuals.remove(index));
                 }
             }
 
             Individual bestIndividual = tournament.get(0);
             int bestParetoRank = paretoFrontsMap.get(bestIndividual);
-            for (Individual individual : tournament) {
-                if (paretoFrontsMap.get(individual) < bestParetoRank) {
-                    bestParetoRank = paretoFrontsMap.get(individual);
-                    bestIndividual = individual;
-                }
-            }
-
             List<Individual> bestIndividuals = new ArrayList<>();
+            
             for (Individual individual : tournament) {
-                if (paretoFrontsMap.get(individual) == bestParetoRank) {
+                int individualParetoRank = paretoFrontsMap.get(individual);
+                
+                if (individualParetoRank < bestParetoRank) {
+                    bestParetoRank = individualParetoRank;
+                    bestIndividual = individual;
+                    bestIndividuals.clear();
                     bestIndividuals.add(individual);
-                } 
+                } else if (individualParetoRank == bestParetoRank) {
+                    bestIndividuals.add(individual);
+                }
             }
 
             if (bestIndividuals.size() == 1) {
@@ -71,7 +73,7 @@ public class TournamentParentSelector implements ParentSelector{
                         allIndividualsInParetoFront.add(individual);
                     }
                 }
-                Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(allIndividualsInParetoFront); // This should proably be saved, to save computation time
+                Map<Individual, Double> crowdingDistances = ObjectiveFunctions.getCrowdingDistances(allIndividualsInParetoFront);
                 Individual bestIndividualInTournament = bestIndividuals.get(0);
                 double bestCrowdingDistance = crowdingDistances.get(bestIndividualInTournament);
                 for (Individual individual : bestIndividuals) {

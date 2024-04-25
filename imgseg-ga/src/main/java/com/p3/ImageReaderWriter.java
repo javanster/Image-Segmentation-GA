@@ -12,10 +12,10 @@ import java.util.Set;
 /**
  * The ImageReader class provides utility methods for reading and writing images.
  */
-public class ImageReader {
+public class ImageReaderWriter {
 
     // Private constructor to prevent instantiation
-    private ImageReader() {
+    private ImageReaderWriter() {
         throw new UnsupportedOperationException("ImageReader is a utility class and should not be instantiated.");
     }
 
@@ -107,15 +107,13 @@ public class ImageReader {
     /**
      * Writes an image with segments to the specified output path.
      *
-     * @param pixels      The list of pixels representing the image.
-     * @param width       The width of the image.
-     * @param height      The height of the image.
      * @param outputPath  The path where the image will be saved.
      * @param individual  The individual containing the segments.
+     * @param isWhite     A boolean indicating whether the image should be saved with white or original background.
      */
     public static void writeImageWithSegments(String outputPath, Individual individual, boolean isWhite) {
         List<Set<Integer>> segments = individual.getSegments();
-        int width = Parameters.IMAGE.getImageLength();
+        int width = Parameters.IMAGE.getImageWith();
         int height = Parameters.IMAGE.getImageHeight();
         List<List<Integer>> pixels = Parameters.IMAGE.getPixels();
 
@@ -207,9 +205,9 @@ public class ImageReader {
 
     public static void main(String[] args) {
         String imagePath = "training_images/118035/Test image.jpg";
-        List<List<Integer>> pixels = ImageReader.getImagePixels(imagePath);
+        List<List<Integer>> pixels = ImageReaderWriter.getImagePixels(imagePath);
 
-        int[] dimensions = ImageReader.getImageDimensions(imagePath);
+        int[] dimensions = ImageReaderWriter.getImageDimensions(imagePath);
 
         int width = dimensions[0];
         int height = dimensions[1];

@@ -5,40 +5,54 @@ import java.util.List;
 
 /**
  * Represents a population of individuals.
- *
- * @param populationSize The size of the population.
- * @param imageFilePath The path to the image file.
  */
 public class Population {
     
     private List<Individual> individuals;
 
     /**
-     * Constructs a Population object with the specified parameters.
-     *
-     * @param populationSize the size of the population
-     * @param imageFilePath the file path of the image
-     * @param lowerBound the lower bound for the number of segments
-     * @param upperBound the upper bound for the number of segments
+     * Creates a population of individuals. The number of individuals in the population is determined by the
+     * Parameters.POPULATION_SIZE parameter. Individuals are created with a random number of segments between
+     * Parameters.SEGMENTS_LOWEBOUND and Parameters.SEGMENTS_UPPERBOUND, with at least one individual for each
+     * segment count.
      */
     public Population() {
         List<Individual> individuals = new ArrayList<>();
 
+
         for (int i = 0; i < Parameters.POPULATION_SIZE; i++) {
-            // pick a random number of segments between lowerBound and upperBound
-            int numSegments = Parameters.SEGMENTS_LOWEBOUND + (int) (Math.random() * (Parameters.SEGMENTS_UPPERBOUND - Parameters.SEGMENTS_LOWEBOUND));
+            int numSegments = i;
+            
+            // Ensures that every segment count has at least one individual
+            if (numSegments >= Parameters.SEGMENTS_LOWEBOUND && numSegments <= Parameters.SEGMENTS_UPPERBOUND) {
+                individuals.add(new Individual(i));
+            } else {
+                // pick a random number of segments between lowerBound and upperBound
+                numSegments = Parameters.SEGMENTS_LOWEBOUND + (int) (Math.random() * (Parameters.SEGMENTS_UPPERBOUND - Parameters.SEGMENTS_LOWEBOUND));
+                individuals.add(new Individual(numSegments));
+            }
             System.out.println("Creating individual " + (i + 1) + " of " + Parameters.POPULATION_SIZE + ", with " + numSegments + " segments");
-            individuals.add(new Individual(numSegments));
         }
 
         this.individuals = individuals;
     }
 
 
+    /**
+     * Creates a population of individuals from a list of individuals.
+     * 
+     * @param individuals A list of individuals.
+     */
     public Population(List<Individual> individuals) {
         this.individuals = individuals;
     }
 
+    /**
+     * Creates a population of individuals from two populations.
+     * 
+     * @param population1 The first population.
+     * @param population2 The second population.
+     */
     public Population(Population population1, Population population2) {
         List<Individual> individualsFromBoth = population1.getIndividuals();
         individualsFromBoth.addAll(population2.getIndividuals());
@@ -46,9 +60,9 @@ public class Population {
     }
 
     /**
-     * Returns a list of individuals in the population.
+     * Returns a list of copies of individuals in the population.
      * 
-     * @return A list of individuals in the population.
+     * @return A list of copies of individuals in the population.
      */
     public List<Individual> getIndividuals() {
         return new ArrayList<>(this.individuals);

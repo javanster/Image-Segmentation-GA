@@ -47,8 +47,8 @@ public class TwoPointCrosser implements CrossoverHandler{
         }
 
         Individual[] children = new Individual[2];
-        children[0] = new Individual(child1, parent1);
-        children[1] = new Individual(child2, parent2);
+        children[0] = new Individual(child1);
+        children[1] = new Individual(child2);
 
         return children;
     }

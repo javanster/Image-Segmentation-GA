@@ -7,30 +7,32 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * A class that selects survivors for the next generation. Uses the Mu + Lambda survivor selection strategy,
- * where lambda is the population size.
+ * Class for selecting survivors from a population containg individuals of both the previous and current generation.
  * 
- * Based on:
- * Deb, K., Pratap, A., Agarwal, S., & Meyarivan, T. (2002). A fast and elitist multiobjective genetic algorithm:
- * NSGA-II. IEEE Transactions on Evolutionary Computation, 6(2), p. 185. https://doi.org/10.1109/4235.996017 
  */
 public class SurvivorSelector {
     
-    public static Population selectSurvivors(Population oldGeneration, Population newGeneration) {
+    /**
+     * Select survivors from the previous and current generation. The survivors are selected based on the
+     * non-dominated sorting and crowding distance.
+     * 
+     * @param prevAndNewGen the population containing individuals from the previous and current generation.
+     * @return the population containing the survivors.
+     */
+    public static Population selectSurvivors(Population prevAndNewGen) {
         List<Individual> survivors = new ArrayList<>();
 
-        List<Individual> unionList = new ArrayList<>(oldGeneration.getIndividuals());
-        unionList.addAll(newGeneration.getIndividuals());
-        Population union = new Population(unionList);
-
-        List<List<Individual>> paretoFronts = ObjectiveFunctions.getParetoFronts(union.getIndividuals());
+        List<List<Individual>> paretoFronts = ObjectiveFunctions.getParetoFronts(prevAndNewGen.getIndividuals());
         int paretoFront = 0;
 
+        // Adds individuals from subsequent pareto fronts until the population size is reached
+        // or the addition of a new front would exceed the population size
         while (survivors.size() < Parameters.POPULATION_SIZE && survivors.size() + paretoFronts.get(paretoFront).size() <= Parameters.POPULATION_SIZE) {
             survivors.addAll(paretoFronts.get(paretoFront));
             paretoFront++;
         }
 
+        // If the population size is not reached, add the individuals from the next pareto front based on crowding distance
         if (survivors.size() < Parameters.POPULATION_SIZE) {
             int numRemainingParentsToAdd = Parameters.POPULATION_SIZE - survivors.size();
             List<Individual> nextParetoFront = paretoFronts.get(paretoFront);
