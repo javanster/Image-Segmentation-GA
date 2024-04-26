@@ -26,8 +26,7 @@ public class NSGAII {
             Population parents = Parameters.PARENT_SELECTOR.selectParents(population); 
             Population offspring = OffspringGenerator.generateOffspring(parents);
             population = new Population(parents, offspring);
-            // Survivor selection not necessary until termination, since parent selection
-            // reduces population to correct population size
+            population = SurvivorSelector.selectSurvivors(population);
         }
 
         System.out.println("Size of first pareto front before population reduction: " +
@@ -163,10 +162,10 @@ public class NSGAII {
     }
 
     public static void main(String[] args) {
-        Parameters.IMAGE_NAME = "353013";
+        Parameters.IMAGE_NAME = "86016";
         Parameters.IMAGE = new Image("training_images/" + Parameters.IMAGE_NAME + "/Test image.jpg");
-        Parameters.SEGMENTS_LOWEBOUND = 6;
-        Parameters.SEGMENTS_UPPERBOUND = 15;
+        Parameters.SEGMENTS_LOWEBOUND = 4;
+        Parameters.SEGMENTS_UPPERBOUND = 41;
         Parameters.POPULATION_SIZE = 100;
         Parameters.PARENT_SELECTOR = new TournamentParentSelector();
         Parameters.TOURNAMENT_SIZE = 7;
